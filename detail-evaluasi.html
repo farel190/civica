@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi Saya - CivicaCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6A38C2;
+            /* Ungu - untuk tema relawan */
+            --dark-text: #1a202c;
+            --light-text: #555;
+            --border-color: #e2e8f0;
+            --unread-bg: #f0ebf9;
+            --success-color: #28a745;
+            --medium-color: #ffc107;
+            --fail-color: #dc3545;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            background-image: url('bg.png');
+            /* Pastikan background gambar diterapkan */
+            background-attachment: fixed;
+            /* Agar background tidak ikut scroll */
+            display: flex;
+            /* Menggunakan flexbox untuk layout utama */
+            flex-direction: column;
+            /* Header dan main disusun vertikal */
+        }
+
+        main {
+            flex-grow: 1;
+            /* Main mengambil sisa ruang */
+            padding: 40px;
+            /* Padding untuk konten utama */
+        }
+
+        .bg-image {
+            background-image: url('bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+        }
+
+        .detail-container {
+            width: 100%;
+            max-width: 900px;
+            /* Increased width for more columns */
+            margin: 0 auto;
+            /* Pusatkan konten */
+            padding: 0 20px;
+            /* Padding horizontal */
+            margin-top: 30px;
+            /* Added for spacing from main header */
+        }
+
+        .detail-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+        }
+
+        /* === Header === */
+        .main-header {
+            background-color: #fff;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--dark-text);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 10px;
+        }
+
+        .logo h1 {
+            font-family: 'Lora', serif;
+            font-size: 1.8rem;
+            margin: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            /* Ensure no extra margin from previous iterations */
+            font-size: 1.8rem;
+            color: var(--dark-text);
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .filter-section label {
+            display: block;
+            margin-bottom: 5px;
+            /* Kurangi margin bawah */
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        .filter-section select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .star-rating {
+            font-size: 0.9rem;
+            /* Smaller stars */
+        }
+
+
+        /* === NEW: Star Rating Styles === */
+        .star-rating {
+            white-space: nowrap;
+            /* Keep stars on one line */
+        }
+
+        .star-rating .fas.fa-star {
+            color: gold;
+            /* Color for filled stars */
+        }
+
+        .star-rating .far.fa-star {
+            color: #ccc;
+            /* Color for empty stars */
+        }
+
+        /* === NEW: Performance Chart Styles === */
+        .performance-chart-container {
+            /* margin-top: 30px; */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            max-width: 350px;
+            margin: 20px auto 0 auto;
+            /* Center the container with top margin */
+            text-align: center;
+        }
+
+        #performanceChart {
+            max-height: 250px;
+            /* Reduced for smaller visual */
+            /* Ensure chart itself doesn't exceed height */
+        }
+
+        /* === NEW: Performance Trend Chart Container Styles === */
+        .trend-chart-container {
+            width: 100%;
+            max-width: 700px;
+            /* Adjust as needed for better readability of line chart */
+            margin: 20px auto 0 auto;
+            /* Center the chart */
+            padding: 15px;
+            background-color: #fff;
+            /* Match card background */
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* === NEW: Trend Summary Styles === */
+        .trend-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .summary-item {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .summary-item i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-item h4 {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+        }
+
+        .summary-item p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--light-text);
+        }
+
+        .summary-item.best i {
+            color: var(--success-color);
+        }
+
+        .summary-item.worst i {
+            color: var(--fail-color);
+        }
+
+
+        /* === Tab Navigation Styles === */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            /* [NEW] Sticky styles */
+            position: sticky;
+            top: 77px;
+            /* Height of main-header. Adjust if header height changes. */
+            background-color: #fff;
+            z-index: 990;
+            /* Just below main header */
+            /* Negative margin to span full card width */
+            margin-left: -40px;
+            margin-right: -40px;
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--light-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            top: 1px;
+            /* To align with border */
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        .tab-content {
+            padding-top: 20px;
+            /* Add space to prevent content from hiding under sticky tabs */
+        }
+
+        /* === NEW: Sub-Tab Navigation Styles === */
+        .sub-tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .sub-tab-button {
+            background-color: #f1f1f1;
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .sub-tab-button.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        /* === Overall Success Badge Styles (Copied from evaluasi-keseleluruhan.html) === */
+        .overall-success-badge {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            min-width: 80px;
+            /* Ensure consistent width */
+            display: inline-block;
+            /* Make it behave like a block but allow inline flow */
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid var(--primary-color);
+            transition: all 0.3s;
+            white-space: nowrap;
+            /* Mencegah teks tombol turun baris */
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            /* Light green */
+            color: #155724;
+            /* Dark green text */
+            border: 1px solid var(--success-color);
+        }
+
+        .badge-medium {
+            background-color: #fff3cd;
+            /* Light yellow */
+            color: #856404;
+            /* Dark yellow text */
+            border: 1px solid var(--medium-color);
+        }
+
+        .badge-fail {
+            background-color: #f8d7da;
+            /* Light red */
+            color: #721c24;
+            /* Dark red text */
+            border: 1px solid var(--fail-color);
+        }
+
+        /* Table Styles */
+        /* Reusing styles from admin tables for consistency */
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--primary-color);
+            /* Tetap ungu untuk tema relawan */
+            /* Using primary-color for volunteer side */
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .empty-table-message {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Score display */
+        .score-display {
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        /* Overall Summary */
+        .overall-summary-card {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .overall-summary-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .overall-summary-card p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .overall-summary-card .avg-score-large {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 15px;
+        }
+
+        .overall-summary-card .avg-score-large span {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #888;
+        }
+
+        .overall-summary-card .feedback-summary {
+            background-color: #f9f9f9;
+            border-left: 3px solid var(--primary-color);
+            padding: 15px;
+            border-radius: 5px;
+            font-style: italic;
+            color: #555;
+            margin-top: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <a href="dashboard-relawan.html" class="back-button"><i class="fas fa-arrow-left"></i> Kembali ke Dashboard</a>
+        <div class="logo">
+            <img src="logo.png" alt="Logo Icon CivicaCare" class="logo-icon">
+            <h1>CivicaCare</h1>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="detail-container">
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>Riwayat Evaluasi</h2>
+            </div>
+
+            <div class="tab-navigation">
+                <button class="tab-button active" id="personal-eval-tab-button" data-tab="personal">Evaluasi
+                    Pribadi</button>
+                <button class="tab-button" id="overall-activity-tab-button" data-tab="overall-activity">Evaluasi
+                    Kegiatan</button>
+            </div>
+
+            <div class="tab-content" id="personal-evaluation-tab">
+                <div class="filter-section">
+                    <label for="activity-filter-select">Filter berdasarkan Kegiatan:</label>
+                    <select id="activity-filter-select">
+                        <option value="all">Semua Kegiatan</option>
+                        <!-- Activities will be loaded here -->
+                    </select>
+                </div>
+                <!-- NEW: Sub-Tab Navigation -->
+                <div class="sub-tab-navigation">
+                    <button class="sub-tab-button active" data-subtab="table">Tabel Rincian</button>
+                    <button class="sub-tab-button" data-subtab="charts">Grafik & Tren</button>
+                </div>
+
+                <!-- Sub-Tab Content: Table -->
+                <div class="sub-tab-content" id="table-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Kegiatan</th>
+                                <th>Kedisiplinan (1-5)</th>
+                                <th>Komunikasi (1-5)</th>
+                                <th>Kerja Sama (1-5)</th>
+                                <th>Tanggung Jawab (1-5)</th>
+                                <th>Rata-rata Skor</th>
+                                <th>Dievaluasi Oleh</th>
+                                <th>Umpan Balik</th>
+                            </tr>
+                        </thead>
+                        <tbody id="volunteer-evaluations-table-body">
+                            <!-- Volunteer evaluations will be loaded here -->
+                            <tr>
+                                <td colspan="8" class="empty-table-message" id="no-personal-evaluations-message">Tidak
+                                    ada
+                                    evaluasi pribadi yang
+                                    tersedia untuk Anda.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Sub-Tab Content: Charts -->
+                <div class="sub-tab-content" id="charts-content" style="display: none;">
+                    <div id="overall-summary-card" class="overall-summary-card">
+                        <h3>Performa Keseluruhan Saya</h3>
+                        <p>Rata-rata skor evaluasi Anda di semua kegiatan:</p>
+                        <div class="avg-score-large" id="overall-avg-score">N/A <span>/ 5</span></div>
+                        <div class="performance-chart-container">
+                            <h3>Visualisasi Performa</h3>
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                    <div id="performance-trend-card" class="overall-summary-card" style="margin-top: 30px;">
+                        <h3>Tren Performa Saya</h3>
+                        <p>Perkembangan skor Anda dari waktu ke waktu:</p>
+                        <div class="trend-chart-container" style="height: 300px;">
+                            <canvas id="performanceTrendChart"></canvas>
+                        </div>
+                        <!-- NEW: Summary Section -->
+                        <div class="trend-summary-grid" id="trend-summary-section" style="display: none;">
+                            <div class="summary-item best">
+                                <i class="fas fa-trophy"></i>
+                                <h4>Performa Terbaik</h4>
+                                <p>Skor <strong id="best-performance-score">N/A</strong> pada kegiatan <br><span
+                                        id="best-performance-activity">N/A</span></p>
+                            </div>
+                            <div class="summary-item worst">
+                                <i class="fas fa-arrow-trend-down"></i>
+                                <h4>Performa Terendah</h4>
+                                <p>Skor <strong id="worst-performance-score">N/A</strong> pada kegiatan <br><span
+                                        id="worst-performance-activity">N/A</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="overall-activity-evaluation-tab" style="display: none;">
+                <div class="filter-section">
+                    <label for="overall-activity-filter-select">Filter berdasarkan Kegiatan:</label>
+                    <select id="overall-activity-filter-select">
+                        <option value="all">Semua Kegiatan</option>
+                        <!-- Activities will be loaded here -->
+                    </select>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Kegiatan</th>
+                            <th>Tanggal</th>
+                            <th>Rasio Kehadiran Relawan</th>
+                            <th>Performa Rata-rata Relawan</th>
+                            <th>Status Keberhasilan</th>
+                            <th>Ringkasan Kesimpulan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="overall-activity-evaluations-table-body">
+                        <tr>
+                            <td colspan="6" class="empty-table-message" id="no-overall-activity-evaluations-message">
+                                Tidak
+                                ada evaluasi kegiatan yang
+                                tersedia untuk Anda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const loggedInVolunteerId = localStorage.getItem('loggedInVolunteerId');
+            const loggedInUserRole = localStorage.getItem('loggedInUserRole');
+
+            const personalEvalTabButton = document.getElementById('personal-eval-tab-button');
+            const overallActivityTabButton = document.getElementById('overall-activity-tab-button');
+            const personalEvaluationTab = document.getElementById('personal-evaluation-tab');
+
+            // NEW: Sub-tab elements
+            const subTabButtons = document.querySelectorAll('.sub-tab-button');
+            const tableContent = document.getElementById('table-content');
+            const chartsContent = document.getElementById('charts-content');
+            const overallActivityEvaluationTab = document.getElementById('overall-activity-evaluation-tab');
+
+            const activityFilterSelect = document.getElementById('activity-filter-select'); // For personal eval
+            const overallActivityFilterSelect = document.getElementById('overall-activity-filter-select'); // For overall activity eval
+
+            const volunteerEvaluationsTableBody = document.getElementById('volunteer-evaluations-table-body');
+            const overallActivityEvaluationsTableBody = document.getElementById('overall-activity-evaluations-table-body');
+            const noPersonalEvaluationsMessage = document.getElementById('no-personal-evaluations-message');
+            const noOverallActivityEvaluationsMessage = document.getElementById('no-overall-activity-evaluations-message');
+
+            const overallSummaryCard = document.getElementById('overall-summary-card');
+            const overallAvgScoreDisplay = document.getElementById('overall-avg-score');
+            const performanceChartCanvas = document.getElementById('performanceChart');
+            let performanceChartInstance = null; // To store Chart.js instance
+
+            // NEW: Trend Chart elements
+            const performanceTrendCard = document.getElementById('performance-trend-card');
+            const performanceTrendChartCanvas = document.getElementById('performanceTrendChart');
+            let performanceTrendChartInstance = null; // To store Chart.js instance for trend
+
+            // --- Autentikasi dan Redirect ---
+            if (!loggedInVolunteerId) {
+                alert('Anda harus login sebagai relawan untuk melihat evaluasi.');
+                window.location.href = 'login.html';
+                return;
+            } else if (loggedInUserRole !== 'relawan') {
+                alert('Akses ditolak. Anda tidak memiliki izin untuk melihat halaman ini.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // --- Data Loading Functions ---
+            async function loadApplicants() {
+                let applicants = JSON.parse(localStorage.getItem('applicantsData'));
+                return applicants || [];
+            }
+
+            async function loadActivities() {
+                let activities = JSON.parse(localStorage.getItem('activitiesData'));
+                return activities || [];
+            }
+
+            async function loadVolunteerEvaluations() {
+                let evaluations = JSON.parse(localStorage.getItem('volunteerEvaluationsData'));
+                return evaluations || [];
+            }
+            async function loadAssignments() {
+                let assignments = JSON.parse(localStorage.getItem('assignmentsData'));
+                return assignments || [];
+            }
+            async function loadOverallEvaluations() {
+                let overallEvaluations = JSON.parse(localStorage.getItem('overallEvaluationsData'));
+                return overallEvaluations || [];
+            }
+
+            // --- Populate Activity Filter Dropdown ---
+            async function populateActivityFilterDropdowns() {
+                const activities = await loadActivities();
+                const volunteerEvaluations = await loadVolunteerEvaluations();
+                const assignments = await loadAssignments();
+                const overallEvaluations = await loadOverallEvaluations();
+
+                // For Personal Evaluation Tab
+                // Filter activities that the logged-in volunteer has evaluations for
+                const relevantActivityIds = new Set(
+                    volunteerEvaluations
+                        .filter(eval => eval.volunteer_id === loggedInVolunteerId)
+                        .map(eval => eval.activity_id)
+                );
+
+                activityFilterSelect.innerHTML = '<option value="all">Semua Kegiatan</option>';
+                activities.forEach(activity => {
+                    if (relevantActivityIds.has(activity.id)) {
+                        const option = document.createElement('option');
+                        option.value = activity.id;
+                        option.textContent = `${activity.nama_kegiatan} (${new Date(activity.tanggal).toLocaleDateString('id-ID')})`;
+                        activityFilterSelect.appendChild(option);
+                    }
+                });
+
+                // For Overall Activity Evaluation Tab
+                // Filter activities where the logged-in volunteer was assigned AND the activity has an overall evaluation
+                const relevantOverallActivityIds = new Set();
+                assignments.forEach(assign => {
+                    if (assign.assigned_volunteer_ids && assign.assigned_volunteer_ids.includes(loggedInVolunteerId)) {
+                        // Check if this activity also has an overall evaluation
+                        const hasOverallEval = overallEvaluations.some(oe => oe.activity_id === assign.activity_id);
+                        if (hasOverallEval) {
+                            relevantOverallActivityIds.add(assign.activity_id);
+                        }
+                    }
+                });
+
+                overallActivityFilterSelect.innerHTML = '<option value="all">Semua Kegiatan</option>';
+                activities.forEach(activity => {
+                    if (relevantOverallActivityIds.has(activity.id)) {
+                        const option = document.createElement('option');
+                        option.value = activity.id;
+                        option.textContent = `${activity.nama_kegiatan} (${new Date(activity.tanggal).toLocaleDateString('id-ID')})`;
+                        overallActivityFilterSelect.appendChild(option);
+                    }
+                });
+            }
+
+            // --- Render Personal Evaluations Table ---
+            async function renderEvaluationsTable(filterActivityId = 'all') {
+                volunteerEvaluationsTableBody.innerHTML = ''; // Clear existing rows
+                noPersonalEvaluationsMessage.style.display = 'none'; // Hide initial message
+
+                const volunteerEvaluations = await loadVolunteerEvaluations();
+                const activities = await loadActivities();
+
+                let filteredEvaluations = volunteerEvaluations.filter(eval => eval.volunteer_id === loggedInVolunteerId);
+
+                if (filterActivityId !== 'all') {
+                    filteredEvaluations = filteredEvaluations.filter(eval => eval.activity_id === filterActivityId);
+                }
+
+                if (filteredEvaluations.length === 0) {
+                    noPersonalEvaluationsMessage.style.display = 'table-row';
+                    // Hide chart cards if no data, but don't switch tabs
+                    overallSummaryCard.style.display = 'none';
+                    performanceTrendCard.style.display = 'none';
+                    return;
+                }
+
+                let totalOverallScore = 0;
+                let totalEvaluationsCount = 0;
+                let totalKedisiplinan = 0;
+                let totalKomunikasi = 0;
+                let totalKerjasama = 0;
+                let totalTanggungJawab = 0;
+
+                // Clear previous chart if exists
+                if (performanceChartInstance) performanceChartInstance.destroy();
+                // NEW: Clear previous trend chart if exists
+                if (performanceTrendChartInstance) performanceTrendChartInstance.destroy();
+
+
+                filteredEvaluations.forEach(evaluation => {
+                    const activity = activities.find(act => act.id === evaluation.activity_id);
+                    const activityName = activity ? activity.nama_kegiatan : 'Kegiatan Tidak Ditemukan';
+
+                    const avgScore = (evaluation.kedisiplinan + evaluation.komunikasi + evaluation.kerjasama + evaluation.tanggung_jawab) / 4;
+                    totalOverallScore += avgScore;
+                    totalEvaluationsCount++;
+                    totalKedisiplinan += evaluation.kedisiplinan;
+                    totalKomunikasi += evaluation.komunikasi;
+                    totalKerjasama += evaluation.kerjasama;
+                    totalTanggungJawab += evaluation.tanggung_jawab;
+
+                    // [NEW] Determine evaluator text
+                    let evaluatorText = 'Admin'; // Default for older data
+                    if (evaluation.evaluated_by) {
+                        if (evaluation.evaluated_by.role === 'koordinator') {
+                            evaluatorText = `Koordinator (${evaluation.evaluated_by.name})`;
+                        }
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${activityName}</td>
+                        <td>${generateStarRating(evaluation.kedisiplinan)}</td>
+                        <td>${generateStarRating(evaluation.komunikasi)}</td>
+                        <td>${generateStarRating(evaluation.kerjasama)}</td>
+                        <td>${generateStarRating(evaluation.tanggung_jawab)}</td>
+                        <td><span class="score-display">${avgScore.toFixed(1)} / 5</span></td>
+                        <td>${evaluatorText}</td>
+                        <td>${evaluation.umpan_balik || '-'}</td>
+                    `;
+                    volunteerEvaluationsTableBody.appendChild(row);
+                });
+
+                // Render Overall Summary
+                if (totalEvaluationsCount > 0) {
+                    const overallAvg = (totalOverallScore / totalEvaluationsCount).toFixed(1);
+                    overallAvgScoreDisplay.innerHTML = `${overallAvg} <span>/ 5</span>`;
+                    overallSummaryCard.style.display = 'block'; // Make sure summary card is visible
+
+                    // Render Performance Chart
+                    const avgKedisiplinan = totalEvaluationsCount > 0 ? (totalKedisiplinan / totalEvaluationsCount).toFixed(1) : 0;
+                    const avgKomunikasi = totalEvaluationsCount > 0 ? (totalKomunikasi / totalEvaluationsCount).toFixed(1) : 0;
+                    const avgKerjasama = totalEvaluationsCount > 0 ? (totalKerjasama / totalEvaluationsCount).toFixed(1) : 0;
+                    const avgTanggungJawab = totalEvaluationsCount > 0 ? (totalTanggungJawab / totalEvaluationsCount).toFixed(1) : 0;
+
+                    renderPerformanceChart({
+                        kedisiplinan: avgKedisiplinan,
+                        komunikasi: avgKomunikasi,
+                        kerjasama: avgKerjasama,
+                        tanggung_jawab: avgTanggungJawab
+                    });
+
+                    // NEW: Collect all evaluations for trend chart (regardless of current filter)
+                    const allVolunteerEvaluations = volunteerEvaluations.filter(eval => eval.volunteer_id === loggedInVolunteerId);
+                    // NEW: Render Trend Chart if enough data
+                    if (allVolunteerEvaluations.length > 1) { // Need at least 2 points for a trend
+                        renderPerformanceTrendChart(allVolunteerEvaluations, activities);
+                        performanceTrendCard.style.display = 'block'; // Make sure trend card is visible
+                    } else {
+                        // If not enough data for trend, hide the trend card specifically
+                        performanceTrendCard.style.display = 'none';
+                    }
+                }
+            }
+
+            // --- Render Overall Activity Evaluations Table ---
+            async function renderOverallActivityEvaluations(filterActivityId = 'all') {
+                overallActivityEvaluationsTableBody.innerHTML = '';
+                noOverallActivityEvaluationsMessage.style.display = 'none';
+
+                const overallEvaluations = await loadOverallEvaluations();
+                const activities = await loadActivities();
+                const assignments = await loadAssignments();
+                const volunteerEvaluations = await loadVolunteerEvaluations(); // Load volunteer evaluations
+
+
+                // Filter overall evaluations for activities the current volunteer was assigned to
+                let relevantOverallEvaluations = overallEvaluations.filter(oe => {
+                    const assignment = assignments.find(assign => assign.activity_id === oe.activity_id);
+                    return assignment && assignment.assigned_volunteer_ids && assignment.assigned_volunteer_ids.includes(loggedInVolunteerId);
+                });
+
+                if (filterActivityId !== 'all') {
+                    relevantOverallEvaluations = relevantOverallEvaluations.filter(oe => oe.activity_id === filterActivityId);
+                }
+
+                if (relevantOverallEvaluations.length === 0) {
+                    noOverallActivityEvaluationsMessage.style.display = 'table-row';
+                    return;
+                }
+
+                relevantOverallEvaluations.forEach(evaluation => {
+                    const activity = activities.find(act => act.id === evaluation.activity_id);
+                    const assignment = assignments.find(assign => assign.activity_id === evaluation.activity_id);
+
+                    const activityName = activity ? activity.nama_kegiatan : 'Kegiatan Tidak Ditemukan';
+                    const activityDate = activity ? new Date(activity.tanggal).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : 'N/A';
+
+                    // Calculate Attendance Ratio for this activity
+                    let attendanceRatioText = 'N/A';
+                    let avgPerformanceText = 'N/A';
+
+                    if (assignment && assignment.assigned_volunteer_ids.length > 0) {
+                        const totalAssigned = assignment.assigned_volunteer_ids.length;
+                        let presentCount = 0;
+                        let totalScore = 0;
+                        let evaluatedCount = 0;
+
+                        assignment.assigned_volunteer_ids.forEach(volId => {
+                            const volEval = volunteerEvaluations.find(ve => ve.activity_id === evaluation.activity_id && ve.volunteer_id === volId);
+                            if (volEval) {
+                                if (volEval.is_present) presentCount++;
+                                totalScore += (volEval.kedisiplinan + volEval.komunikasi + volEval.kerjasama + volEval.tanggung_jawab) / 4;
+                                evaluatedCount++;
+                            }
+                        });
+                        attendanceRatioText = `${((presentCount / totalAssigned) * 100).toFixed(0)}% (${presentCount}/${totalAssigned} Hadir)`;
+                        avgPerformanceText = evaluatedCount > 0 ? `${(totalScore / evaluatedCount).toFixed(1)} / 5` : 'N/A';
+                    }
+
+                    let badgeClass = '';
+                    let badgeText = '';
+                    if (evaluation.indicator === 'berhasil') {
+                        badgeClass = 'badge-success';
+                        badgeText = 'Berhasil';
+                    } else if (evaluation.indicator === 'sedang') {
+                        badgeClass = 'badge-medium';
+                        badgeText = 'Sedang';
+                    } else if (evaluation.indicator === 'gagal') {
+                        badgeClass = 'badge-fail';
+                        badgeText = 'Gagal';
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${activityName}</td>
+                        <td>${activityDate}</td>
+                        <td>${attendanceRatioText}</td>
+                        <td>${avgPerformanceText}</td>
+                        <td><span class="overall-success-badge ${badgeClass}">${badgeText}</span></td>
+                        <td>${evaluation.kesimpulan || '-'}</td>
+                    `;
+                    overallActivityEvaluationsTableBody.appendChild(row);
+                });
+            }
+
+            // --- Event Listeners ---
+            activityFilterSelect.addEventListener('change', function () {
+                renderEvaluationsTable(this.value);
+            });
+
+            overallActivityFilterSelect.addEventListener('change', function () {
+                renderOverallActivityEvaluations(this.value);
+            });
+
+            personalEvalTabButton.addEventListener('click', function () {
+                personalEvalTabButton.classList.add('active');
+                overallActivityTabButton.classList.remove('active');
+                personalEvaluationTab.style.display = 'block';
+                overallActivityEvaluationTab.style.display = 'none';
+                renderEvaluationsTable(activityFilterSelect.value); // Re-render personal tab
+            });
+
+            overallActivityTabButton.addEventListener('click', function () {
+                personalEvalTabButton.classList.remove('active');
+                overallActivityTabButton.classList.add('active');
+                personalEvaluationTab.style.display = 'none';
+                overallActivityEvaluationTab.style.display = 'block';
+                renderOverallActivityEvaluations(overallActivityFilterSelect.value); // Re-render overall activity tab
+            });
+
+            // NEW: Sub-Tab Click Handler
+            subTabButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    subTabButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const subTab = this.dataset.subtab;
+                    if (subTab === 'table') {
+                        tableContent.style.display = 'block';
+                        chartsContent.style.display = 'none';
+                    } else if (subTab === 'charts') {
+                        tableContent.style.display = 'none';
+                        chartsContent.style.display = 'block';
+                    }
+                });
+            });
+
+            // --- NEW: Function to generate star HTML ---
+            function generateStarRating(score) {
+                let starsHtml = '<span class="star-rating">';
+                for (let i = 1; i <= 5; i++) {
+                    if (i <= score) {
+                        starsHtml += '<i class="fas fa-star"></i>'; // Filled star
+                    } else {
+                        starsHtml += '<i class="far fa-star"></i>'; // Empty star
+                    }
+                }
+                starsHtml += '</span>';
+                return starsHtml;
+            }
+
+            // --- NEW: Function to render performance chart (Radar) ---
+            function renderPerformanceChart(data) {
+                const ctx = performanceChartCanvas.getContext('2d');
+
+                performanceChartInstance = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Kedisiplinan', 'Komunikasi', 'Kerja Sama', 'Tanggung Jawab'],
+                        datasets: [{
+                            label: 'Rata-rata Performa',
+                            data: [data.kedisiplinan, data.komunikasi, data.kerjasama, data.tanggung_jawab],
+                            backgroundColor: 'rgba(106, 56, 194, 0.2)', // Primary color with transparency
+                            borderColor: 'rgba(106, 56, 194, 1)',
+                            borderWidth: 1,
+                            pointBackgroundColor: 'rgba(106, 56, 194, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(106, 56, 194, 1)'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                angleLines: { display: false },
+                                suggestedMin: 0,
+                                suggestedMax: 5,
+                                ticks: { stepSize: 1, display: false }, // Hide ticks but keep steps
+                                pointLabels: { font: { size: 12, weight: 'bold' } }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }, // Hide legend
+                            tooltip: { enabled: true }
+                        },
+                        elements: {
+                            line: { borderWidth: 3 }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false // Allow custom sizing
+                    }
+                });
+            }
+
+            // [REVISED] Function to render a simplified and clearer performance trend chart
+            function renderPerformanceTrendChart(evaluations, activities) {
+                const ctx = performanceTrendChartCanvas.getContext('2d');
+
+                // Sort evaluations by date to ensure the trend is chronological
+                evaluations.sort((a, b) => new Date(a.evaluated_at) - new Date(b.evaluated_at));
+
+                const labels = evaluations.map(eval => new Date(eval.evaluated_at).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }));
+                const averageScoreData = evaluations.map(evaluation => {
+                    return (evaluation.kedisiplinan + evaluation.komunikasi + evaluation.kerjasama + evaluation.tanggung_jawab) / 4;
+                });
+
+                // [NEW] Find best and worst performance and update summary
+                if (averageScoreData.length > 0) {
+                    const trendSummarySection = document.getElementById('trend-summary-section');
+                    const bestPerformanceScoreEl = document.getElementById('best-performance-score');
+                    const bestPerformanceActivityEl = document.getElementById('best-performance-activity');
+                    const worstPerformanceScoreEl = document.getElementById('worst-performance-score');
+                    const worstPerformanceActivityEl = document.getElementById('worst-performance-activity');
+
+                    const maxScore = Math.max(...averageScoreData);
+                    const minScore = Math.min(...averageScoreData);
+
+                    const bestEvalIndex = averageScoreData.findIndex(score => score === maxScore);
+                    const worstEvalIndex = averageScoreData.findIndex(score => score === minScore);
+
+                    const bestActivity = activities.find(act => act.id === evaluations[bestEvalIndex].activity_id);
+                    const worstActivity = activities.find(act => act.id === evaluations[worstEvalIndex].activity_id);
+
+                    bestPerformanceScoreEl.textContent = maxScore.toFixed(1);
+                    bestPerformanceActivityEl.textContent = bestActivity ? bestActivity.nama_kegiatan : 'N/A';
+                    worstPerformanceScoreEl.textContent = minScore.toFixed(1);
+                    worstPerformanceActivityEl.textContent = worstActivity ? worstActivity.nama_kegiatan : 'N/A';
+                    trendSummarySection.style.display = 'grid';
+                }
+
+                // Create a gradient for the fill
+                const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+                gradient.addColorStop(0, 'rgba(106, 56, 194, 0.4)'); // Start color (primary-color with opacity)
+                gradient.addColorStop(1, 'rgba(106, 56, 194, 0)');   // End color (transparent)
+
+                performanceTrendChartInstance = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Rata-rata Skor',
+                            data: averageScoreData,
+                            borderColor: 'rgba(106, 56, 194, 1)', // --primary-color
+                            backgroundColor: gradient, // Use the gradient
+                            fill: true, // Enable the fill
+                            tension: 0.4, // Make the line smoother
+                            pointBackgroundColor: 'rgba(106, 56, 194, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverRadius: 7,
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(106, 56, 194, 1)',
+                            pointRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 5,
+                                ticks: { stepSize: 1 },
+                                title: {
+                                    display: true,
+                                    text: 'Rata-rata Skor (1-5)'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Tanggal Evaluasi'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false }, // Hide legend as there's only one dataset
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: function (context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y.toFixed(1);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Initial Load ---
+            await populateActivityFilterDropdowns();
+            await renderEvaluationsTable(); // Render with 'all' filter initially
+        });
+    </script>
+</body>
+
+</html>

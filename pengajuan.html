@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengajuan Relawan - CivicaCare Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        /* === Pengaturan Dasar === */
+        :root {
+            --primary-red: #C70000;
+            --bg-light: #F8F9FA;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --primary-color: #6A38C2;
+            /* Added for consistency */
+            --primary-light: #F0EBf9;
+            /* Ungu Muda */
+            --secondary-color: #CC0000;
+            /* Merah */
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* === Sidebar (Kiri) === */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-red);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            position: relative;
+            /* Ensure z-index works */
+            z-index: 10;
+            /* Make sure it's above main content */
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            /* Lebar saat disembunyikan */
+        }
+
+        .sidebar.collapsed .sidebar-header h2,
+        .sidebar.collapsed .sidebar-nav li a span,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+            /* Sembunyikan teks */
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding-bottom: 10px;
+            /* Make header more compact when collapsed */
+            margin-bottom: 10px;
+            /* Reduce space below header when collapsed */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            justify-content: flex-start;
+            /* Align items to start */
+        }
+
+        #menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 10px;
+            /* Space between toggle and title */
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 10px;
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            position: relative;
+            /* Diperlukan untuk positioning dot dan tooltip */
+        }
+
+        .sidebar-nav li a:hover,
+        .sidebar-nav li.active a {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-nav li a .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            /* Prevent icon from shrinking */
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            /* Mendorong logout ke bawah */
+        }
+
+        .sidebar-nav .notification-dot {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            background-color: #ffc107;
+            /* Kuning untuk perhatian */
+            border-radius: 50%;
+            border: 2px solid var(--primary-red);
+        }
+
+        /* Tooltip styles for collapsed sidebar */
+        .sidebar.collapsed .sidebar-nav li a::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #212529;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .sidebar.collapsed .sidebar-nav li a:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.3s;
+        }
+
+        /* === Konten Utama === */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.shifted {
+            /* margin-left: -180px; */
+            /* Removed: flex-grow handles the shift */
+        }
+
+        .main-content .main-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-shape {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background-color: var(--primary-red);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #495057;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+        }
+
+        .user-info .user-email {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .content-area {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin: 0;
+            color: var(--primary-red);
+        }
+
+        /* === Filter Buttons === */
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-button {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .filter-button:hover {
+            background-color: #dee2e6;
+        }
+
+        .filter-button.active {
+            background-color: var(--primary-red);
+            color: #fff;
+            border-color: var(--primary-red);
+        }
+
+        /* [NEW] Style for highlighting new applicants */
+        .new-applicant-row {
+            background-color: var(--primary-light) !important;
+            /* Light purple from root */
+        }
+
+        .new-applicant-row td {
+            font-weight: 600;
+        }
+
+        /* === Table Styles === */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+            /* Ensures rounded corners apply to table */
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--primary-red);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-diajukan {
+            background-color: #ffc107;
+            /* Yellow */
+            color: #343a40;
+        }
+
+        .status-diseleksi {
+            background-color: #17a2b8;
+            /* Cyan */
+            color: #fff;
+        }
+
+        .status-diterima {
+            background-color: #28a745;
+            /* Green */
+            color: #fff;
+        }
+
+        .status-ditolak {
+            background-color: #dc3545;
+            /* Red */
+            color: #fff;
+        }
+
+        .status-mengundurkan_diri {
+            background-color: #6c757d;
+            /* Gray */
+            color: #fff;
+        }
+
+        .action-buttons-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .button-seleksi {
+            background-color: #007bff;
+            /* Blue */
+            color: #fff;
+        }
+
+        .button-seleksi:hover {
+            background-color: #0056b3;
+        }
+
+        .button-terima {
+            background-color: #28a745;
+            /* Green */
+            color: #fff;
+        }
+
+        .button-terima:hover {
+            background-color: #218838;
+        }
+
+        .button-tolak {
+            background-color: #dc3545;
+            /* Red */
+            color: #fff;
+        }
+
+        .button-tolak:hover {
+            background-color: #c82333;
+        }
+
+        .button-detail {
+            background-color: #6A38C2;
+            /* Primary color for detail button */
+            color: #fff;
+        }
+
+        .button-detail:hover {
+            background-color: #592EAB;
+        }
+
+        .empty-table-message {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* Style for permanent delete button */
+        .button-delete-permanent {
+            background-color: #dc3545;
+            /* Red */
+            color: #fff;
+        }
+
+        .button-delete-permanent:hover {
+            background-color: #c82333;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--primary-red);
+        }
+
+        .modal-close-button {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .modal-close-button:hover {
+            color: #666;
+        }
+
+        .modal-body p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .modal-body strong {
+            display: inline-block;
+            min-width: 120px;
+        }
+
+        .modal-body ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .modal-body li {
+            margin-bottom: 5px;
+        }
+
+        .modal-body .document-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .modal-body .document-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h2>Menu</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="daftar-relawan.html" data-tooltip="Daftar Relawan"><i
+                                class="fa-solid fa-table-columns nav-icon"></i>
+                            <span>Daftar Relawan</span></a>
+                    </li>
+                    <li class="active"><a href="pengajuan.html" data-tooltip="Pengajuan"><i
+                                class="fa-solid fa-file-import nav-icon"></i>
+                            <span>Pengajuan</span>
+                            <span class="notification-dot" id="pengajuan-notif-dot" style="display: none;"></span></a>
+                    </li>
+                    <li><a href="kegiatan.html" data-tooltip="Kegiatan"><i
+                                class="fa-solid fa-people-group nav-icon"></i>
+                            <span>Kegiatan</span></a></li>
+                    <li><a href="penjadwalan.html" data-tooltip="Penjadwalan"><i
+                                class="fa-solid fa-calendar-days nav-icon"></i>
+                            <span>Penjadwalan</span></a></li>
+                    <li><a href="evaluasi-main.html" data-tooltip="Evaluasi"><i
+                                class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <span>Evaluasi</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li><a href="#" id="admin-logout-button" data-tooltip="Logout"><i
+                                    class="fa-solid fa-right-from-bracket nav-icon"></i>
+                                <span>Logout</span></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Konten Utama -->
+        <main class="main-content">
+            <!-- Header Konten -->
+            <header class="main-header">
+                <div class="header-shape"></div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-email">admin@gmail.com</div>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Area Konten Dinamis -->
+            <section class="content-area">
+                <div class="section-header">
+                    <h2>Pengajuan Relawan</h2>
+                    <div class="filter-buttons">
+                        <button class="filter-button active" data-filter="all">Semua</button>
+                        <button class="filter-button" data-filter="diajukan">Diajukan</button>
+                        <button class="filter-button" data-filter="diseleksi">Diseleksi</button>
+                        <button class="filter-button" data-filter="diterima">Diterima</button>
+                        <button class="filter-button" data-filter="ditolak">Ditolak</button>
+                        <button class="filter-button" data-filter="mengundurkan_diri">Mengundurkan Diri</button>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nama Lengkap</th>
+                            <th>NIK</th>
+                            <th>Telepon</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Detail</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="applicants-table-body">
+                        <!-- Data pendaftar akan dimuat di sini oleh JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="applicant-detail-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="detail-modal-title">Detail Pendaftar</h3>
+                <button class="modal-close-button" id="close-detail-modal-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Nama Lengkap:</strong> <span id="detail-name"></span></p>
+                <p><strong>NIK:</strong> <span id="detail-nik"></span></p>
+                <p><strong>Telepon:</strong> <span id="detail-phone"></span></p>
+                <p><strong>Email:</strong> <span id="detail-email"></span></p>
+                <p><strong>Alamat:</strong> <span id="detail-address"></span></p>
+                <p><strong>Pendidikan:</strong> <span id="detail-education"></span></p>
+                <p><strong>Ketersediaan:</strong> <span id="detail-availability"></span></p>
+                <p><strong>Dokumen:</strong> <span id="detail-document"></span></p>
+                <p><strong>Status:</strong> <span id="detail-status"></span></p>
+                <p><strong>Peran:</strong> <span id="detail-role"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- [NEW] Rejection Reason Modal -->
+    <div id="rejection-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="rejection-modal-title">Alasan Penolakan</h3>
+                <button class="modal-close-button" id="close-rejection-modal-button">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="rejection-form">
+                    <p>Mohon berikan alasan mengapa pengajuan dari <strong id="rejection-applicant-name"></strong>
+                        ditolak. Pesan ini akan dikirimkan kepada pendaftar.</p>
+                    <input type="hidden" id="rejection-applicant-id">
+                    <textarea id="rejection-reason" rows="5"
+                        style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-family: 'Poppins', sans-serif; font-size: 1rem; box-sizing: border-box;"
+                        placeholder="Contoh: Data NIK tidak valid, mohon periksa kembali." required></textarea>
+                    <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                        <button type="button" class="action-button" id="cancel-rejection-button"
+                            style="background-color: #6c757d; color: white;">Batal</button>
+                        <button type="submit" class="action-button button-tolak">Kirim Penolakan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // --- PENTING: Cek Autentikasi dan Role ---
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const loggedInUserRole = localStorage.getItem('loggedInUserRole');
+
+            if (!loggedInUser) {
+                alert('Anda harus login untuk mengakses dashboard.');
+                window.location.href = 'login.html';
+                return;
+            } else if (loggedInUserRole !== 'admin') {
+                alert('Akses ditolak. Anda tidak memiliki izin untuk melihat halaman ini.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // --- Sidebar Toggle Logic ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('shifted');
+            });
+
+            const applicantsTableBody = document.getElementById('applicants-table-body');
+            const filterButtons = document.querySelectorAll('.filter-button');
+            let currentFilter = 'all';
+
+            // Modal Elements
+            const applicantDetailModal = document.getElementById('applicant-detail-modal');
+            const closeDetailModalButton = document.getElementById('close-detail-modal-button');
+            const detailModalTitle = document.getElementById('detail-modal-title');
+
+            // [NEW] Rejection Modal Elements
+            const rejectionModal = document.getElementById('rejection-modal');
+            const closeRejectionModalButton = document.getElementById('close-rejection-modal-button');
+            const cancelRejectionButton = document.getElementById('cancel-rejection-button');
+            const rejectionForm = document.getElementById('rejection-form');
+            const rejectionApplicantName = document.getElementById('rejection-applicant-name');
+            const rejectionApplicantIdInput = document.getElementById('rejection-applicant-id');
+            const rejectionReasonTextarea = document.getElementById('rejection-reason');
+
+            // Function to load applicants data
+            async function loadApplicants() {
+                let applicants = JSON.parse(localStorage.getItem('applicantsData'));
+                if (!applicants) {
+                    // If no data in localStorage, fetch from JSON file
+                    try {
+                        const response = await fetch('applicants.json');
+                        if (!response.ok) throw new Error('Failed to load applicants data.');
+                        applicants = await response.json();
+                        localStorage.setItem('applicantsData', JSON.stringify(applicants));
+                    } catch (error) {
+                        console.error('Error loading initial applicants data:', error);
+                        applicants = []; // Fallback to empty array
+                    }
+                }
+                return applicants;
+            }
+
+            // Function to save applicants data
+            function saveApplicants(applicants) {
+                localStorage.setItem('applicantsData', JSON.stringify(applicants));
+            }
+
+            // Function to render the table
+            async function renderTable() {
+                const applicants = await loadApplicants();
+                const adminNotifications = JSON.parse(localStorage.getItem('adminNotificationsData') || '[]');
+                applicantsTableBody.innerHTML = ''; // Clear existing rows
+
+                // [NEW] Get IDs of unread new applicants to highlight them
+                const unreadApplicantIds = new Set(
+                    adminNotifications
+                        .filter(notif => notif.type === 'new_applicant' && !notif.read)
+                        .map(notif => notif.volunteerId)
+                );
+
+                let filteredApplicants = applicants.filter(applicant => {
+                    return currentFilter === 'all' || applicant.status === currentFilter;
+                });
+
+                // [NEW] Sort by newest first by reversing the array
+                filteredApplicants.reverse();
+
+                if (filteredApplicants.length === 0) {
+                    applicantsTableBody.innerHTML = `<tr><td colspan="7" class="empty-table-message">Tidak ada data pendaftar dengan status ini.</td></tr>`;
+                    return;
+                }
+
+                filteredApplicants.forEach(applicant => {
+                    const row = document.createElement('tr');
+
+                    // [NEW] Add highlight class if the applicant is new and unread
+                    if (unreadApplicantIds.has(applicant.id)) {
+                        row.classList.add('new-applicant-row');
+                    }
+
+                    row.innerHTML = `
+                        <td>${applicant.name}</td>
+                        <td>${applicant.nik}</td>
+                        <td>${applicant.phone}</td>
+                        <td>${applicant.email}</td>
+                        <td><span class="status-badge status-${applicant.status}">${applicant.status}</span></td>
+                        <td><button class="action-button button-detail" data-id="${applicant.id}" data-action="view-detail">Lihat Detail</button></td>
+                        <td class="action-buttons-cell">
+                            ${applicant.status === 'diajukan' ? `<button class="action-button button-seleksi" data-id="${applicant.id}" data-action="diseleksi">Seleksi</button>` : ''}
+                            ${applicant.status === 'diseleksi' ? `<button class="action-button button-terima" data-id="${applicant.id}" data-action="diterima">Terima</button>` : ''}
+                            ${applicant.status === 'diseleksi' || applicant.status === 'diajukan' ? `<button class="action-button button-tolak" data-id="${applicant.id}" data-action="tolak">Tolak</button>` : ''}
+                            ${applicant.status === 'mengundurkan_diri' ? `<button class="action-button button-delete-permanent" data-id="${applicant.id}" data-action="delete-permanent">Hapus Permanen</button>` : ''}
+                        </td>
+                    `;
+                    applicantsTableBody.appendChild(row);
+                });
+
+                // Add event listeners to action buttons
+                applicantsTableBody.querySelectorAll('.action-button').forEach(button => {
+                    button.addEventListener('click', handleActionButtonClick);
+                });
+            }
+
+            // Function to open and populate the detail modal
+            function openDetailModal(applicant) {
+                detailModalTitle.textContent = `Detail Pendaftar: ${applicant.name}`;
+                document.getElementById('detail-name').textContent = applicant.name;
+                document.getElementById('detail-nik').textContent = applicant.nik;
+                document.getElementById('detail-phone').textContent = applicant.phone;
+                document.getElementById('detail-email').textContent = applicant.email;
+                document.getElementById('detail-address').textContent = applicant.address;
+                document.getElementById('detail-education').textContent = applicant.education;
+                document.getElementById('detail-availability').textContent = applicant.availability ? applicant.availability.join(', ') : 'Tidak ada';
+
+                const documentSpan = document.getElementById('detail-document');
+                if (applicant.document_name) {
+                    documentSpan.innerHTML = `<a href="#" class="document-link" onclick="alert('Simulasi: Mengunduh ${applicant.document_name}'); return false;">${applicant.document_name}</a>`;
+                } else {
+                    documentSpan.textContent = 'Tidak ada dokumen diunggah.';
+                }
+
+                document.getElementById('detail-status').textContent = applicant.status;
+                document.getElementById('detail-role').textContent = applicant.role || 'relawan';
+
+                applicantDetailModal.style.display = 'flex';
+            }
+
+            // Function to close the detail modal
+            function closeDetailModal() {
+                applicantDetailModal.style.display = 'none';
+            }
+
+            // [NEW] Functions to open/close rejection modal
+            function openRejectionModal(applicant) {
+                rejectionApplicantName.textContent = applicant.name;
+                rejectionApplicantIdInput.value = applicant.id;
+                rejectionModal.style.display = 'flex';
+                rejectionReasonTextarea.focus();
+            }
+
+            function closeRejectionModal() {
+                rejectionForm.reset();
+                rejectionModal.style.display = 'none';
+            }
+
+            closeDetailModalButton.addEventListener('click', closeDetailModal);
+            applicantDetailModal.addEventListener('click', (event) => { if (event.target === applicantDetailModal) closeDetailModal(); });
+
+            // Handle action button clicks
+            async function handleActionButtonClick(event) {
+                const button = event.target;
+                const applicantId = button.dataset.id;
+                const action = button.dataset.action;
+
+                let applicants = await loadApplicants();
+                const applicantIndex = applicants.findIndex(app => app.id === applicantId);
+
+                if (applicantIndex > -1) {
+                    const applicant = applicants[applicantIndex];
+                    if (action === 'view-detail') {
+                        openDetailModal(applicant);
+                    } else if (action === 'delete-permanent') {
+                        if (confirm(`Apakah Anda yakin ingin menghapus data relawan "${applicant.name}" secara permanen? Aksi ini tidak dapat dibatalkan.`)) {
+                            // Remove the applicant from the array
+                            applicants.splice(applicantIndex, 1);
+
+                            // Clean up associated resignation notification
+                            const adminNotificationsKey = 'adminNotificationsData';
+                            let adminNotifications = JSON.parse(localStorage.getItem(adminNotificationsKey) || '[]');
+                            adminNotifications = adminNotifications.filter(notif =>
+                                !(notif.type === 'resignation' && notif.volunteerId === applicantId)
+                            );
+                            localStorage.setItem(adminNotificationsKey, JSON.stringify(adminNotifications));
+
+                            saveApplicants(applicants);
+                            renderTable();
+                            alert(`Data relawan "${applicant.name}" berhasil dihapus secara permanen.`);
+                        }
+                    } else if (action === 'tolak') {
+                        openRejectionModal(applicant);
+                    }
+                    else {
+                        applicant.status = action;
+                        if (action === 'diterima') {
+                            applicant.role = 'relawan';
+                        } else if (action === 'ditolak') {
+                            delete applicant.role;
+                        }
+                        saveApplicants(applicants);
+                        renderTable();
+                    }
+                }
+            }
+
+            // [NEW] Event listeners for rejection modal
+            closeRejectionModalButton.addEventListener('click', closeRejectionModal);
+            cancelRejectionButton.addEventListener('click', closeRejectionModal);
+            rejectionModal.addEventListener('click', (event) => { if (event.target === rejectionModal) closeRejectionModal(); });
+
+
+            // Handle filter button clicks
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.filter;
+                    renderTable();
+                });
+            });
+
+            // [NEW] Handle rejection form submission
+            rejectionForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const applicantId = rejectionApplicantIdInput.value;
+                const reason = rejectionReasonTextarea.value.trim();
+
+                if (!reason) {
+                    alert('Mohon isi alasan penolakan.');
+                    return;
+                }
+
+                let applicants = await loadApplicants();
+                const applicantIndex = applicants.findIndex(app => app.id === applicantId);
+
+                if (applicantIndex > -1) {
+                    // Update applicant status
+                    applicants[applicantIndex].status = 'ditolak';
+                    delete applicants[applicantIndex].role; // Remove role if any
+                    saveApplicants(applicants);
+
+                    // Send notification to the user
+                    const applicant = applicants[applicantIndex];
+                    const user = (JSON.parse(localStorage.getItem('usersData')) || []).find(u => u.email === applicant.email);
+                    if (user) {
+                        const notificationKey = 'userNotifications_' + user.username;
+                        let notifications = JSON.parse(localStorage.getItem(notificationKey) || '[]');
+                        notifications.push({
+                            type: 'application_rejected',
+                            title: 'Pengajuan Ditolak',
+                            message: `Mohon maaf, pengajuan Anda ditolak. Alasan: "${reason}". Silakan perbaiki formulir Anda dan ajukan kembali.`,
+                            read: false
+                        });
+                        localStorage.setItem(notificationKey, JSON.stringify(notifications));
+                    }
+
+                    alert(`Pengajuan dari ${applicant.name} telah ditolak.`);
+                    closeRejectionModal();
+                    renderTable();
+                }
+            });
+
+            // Mark Resignation Notifications as Read on Page Load
+            function markNotificationsAsRead() { // Renamed function
+                const adminNotificationsKey = 'adminNotificationsData';
+                let adminNotifications = JSON.parse(localStorage.getItem(adminNotificationsKey) || '[]');
+                let wasUpdated = false;
+
+                adminNotifications.forEach(notif => {
+                    if ((notif.type === 'resignation' || notif.type === 'new_applicant') && !notif.read) { // Mark both types as read
+                        notif.read = true;
+                        wasUpdated = true;
+                    }
+                });
+
+                if (wasUpdated) {
+                    localStorage.setItem(adminNotificationsKey, JSON.stringify(adminNotifications));
+                    console.log('Admin notifications marked as read.'); // Updated log message
+                }
+            }
+
+            // --- Logout Logic ---
+            const adminLogoutButton = document.getElementById('admin-logout-button');
+            if (adminLogoutButton) {
+                adminLogoutButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    localStorage.removeItem('loggedInUserRole');
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // --- Check Admin Notifications for Sidebar Dot ---
+            function checkAdminNotifications() {
+                const pengajuanNotifDot = document.getElementById('pengajuan-notif-dot');
+                const adminNotifications = JSON.parse(localStorage.getItem('adminNotificationsData') || '[]');
+                const hasUnreadNotifications = adminNotifications.some(
+                    notif => (notif.type === 'resignation' || notif.type === 'new_applicant') && !notif.read
+                );
+
+                if (hasUnreadNotifications && pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'block';
+                } else if (pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'none';
+                }
+            }
+
+            // Initial check on page load
+            checkAdminNotifications();
+
+            // Initial calls
+            markNotificationsAsRead(); // Updated function call
+            renderTable();
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluasi Keseluruhan Kegiatan - CivicaCare Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        /* === Pengaturan Dasar === */
+        :root {
+            --primary-red: #C70000;
+            --bg-light: #F8F9FA;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --primary-color: #6A38C2;
+            /* Added for consistency */
+            --primary-light: #F0EBf9;
+            /* Ungu Muda */
+            --secondary-color: #CC0000;
+            /* Merah */
+            --border-color: #dee2e6;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* === Sidebar (Kiri) === */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-red);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            position: relative;
+            /* Ensure z-index works */
+            z-index: 10;
+            /* Make sure it's above main content */
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            /* Lebar saat disembunyikan */
+        }
+
+        .sidebar.collapsed .sidebar-header h2,
+        .sidebar.collapsed .sidebar-nav li a span,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+            /* Sembunyikan teks */
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding-bottom: 10px;
+            /* Make header more compact when collapsed */
+            margin-bottom: 10px;
+            /* Reduce space below header when collapsed */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            justify-content: flex-start;
+            /* Align items to start */
+        }
+
+        #menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 10px;
+            /* Space between toggle and title */
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 10px;
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            position: relative;
+            /* Diperlukan untuk positioning dot dan tooltip */
+        }
+
+        .sidebar-nav li a:hover,
+        .sidebar-nav li.active a {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-nav li a .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            /* Prevent icon from shrinking */
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            /* Mendorong logout ke bawah */
+        }
+
+        .sidebar-nav .notification-dot {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            background-color: #ffc107;
+            /* Kuning untuk perhatian */
+            border-radius: 50%;
+            border: 2px solid var(--primary-red);
+        }
+
+        /* Tooltip styles for collapsed sidebar */
+        .sidebar.collapsed .sidebar-nav li a::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #212529;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .sidebar.collapsed .sidebar-nav li a:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.3s;
+        }
+
+        /* === Konten Utama === */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.shifted {
+            /* margin-left: -180px; */
+            /* Removed: flex-grow handles the shift */
+        }
+
+        .main-content .main-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-shape {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background-color: var(--primary-red);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #495057;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+        }
+
+        .user-info .user-email {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .content-area {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin: 0;
+            color: var(--primary-red);
+        }
+
+        /* === Filter/Dropdown Section === */
+        .filter-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            /* Allow wrapping on smaller screens */
+        }
+
+        .filter-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+            flex-shrink: 0;
+            /* Prevent label from shrinking */
+        }
+
+        .filter-section select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            flex-grow: 1;
+            /* Allow select to take available space */
+            min-width: 200px;
+            /* Minimum width for select */
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            /* Allow wrapping for buttons */
+        }
+
+        .filter-button {
+            background-color: #e9ecef;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            flex-shrink: 0;
+            /* Prevent buttons from shrinking */
+        }
+
+        .filter-button:hover {
+            background-color: #dee2e6;
+        }
+
+        .filter-button.active {
+            background-color: var(--primary-red);
+            color: #fff;
+            border-color: var(--primary-red);
+            box-shadow: 0 2px 4px rgba(199, 0, 0, 0.2);
+        }
+
+        /* === Evaluation Summary Grid === */
+        .evaluation-summary-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            /* [MODIFIED] Single column for summary */
+            gap: 30px;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .indicator-section h3,
+        .chart-section h3 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        /* === [NEW] Success Chart Styles === */
+        .chart-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .success-chart-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            /* [NEW] Arrange chart and badge vertically */
+            gap: 15px;
+            /* [NEW] Space between chart and badge */
+        }
+
+        /* === [NEW] Overall Success Badge Styles === */
+        .overall-success-badge {
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-align: center;
+            min-width: 120px;
+            /* Ensure consistent width */
+        }
+
+        .badge-success {
+            background-color: #d4edda;
+            /* Light green */
+            color: #155724;
+            /* Dark green text */
+            border: 1px solid #28a745;
+        }
+
+        .badge-medium {
+            background-color: #fff3cd;
+            /* Light yellow */
+            color: #856404;
+            /* Dark yellow text */
+            border: 1px solid #ffc107;
+        }
+
+        .badge-fail {
+            background-color: #f8d7da;
+            /* Light red */
+            color: #721c24;
+            /* Dark red text */
+            border: 1px solid #dc3545;
+        }
+
+        /* === Evaluation Details Card === */
+        .evaluation-details-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+        }
+
+        .evaluation-details-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .success-chart {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(var(--chart-color, #e9ecef) calc(var(--percentage) * 1%), #e9ecef calc(var(--percentage) * 1%));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transition: background 0.5s ease;
+        }
+
+        /* This creates the inner circle to make it a donut chart */
+        .success-chart::before {
+            content: '';
+            position: absolute;
+            width: 80%;
+            height: 80%;
+            background: #fff;
+            border-radius: 50%;
+        }
+
+        .chart-percentage {
+            position: relative;
+            /* To be on top of the ::before pseudo-element */
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .detail-item strong {
+            display: block;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .detail-item span {
+            color: #555;
+        }
+
+        .detail-item ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            color: #555;
+        }
+
+        .detail-item li {
+            margin-bottom: 5px;
+        }
+
+        textarea.conclusion-textarea {
+            width: calc(100% - 24px);
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            min-height: 100px;
+            resize: vertical;
+            margin-top: 10px;
+        }
+
+        .save-overall-evaluation-button {
+            background-color: var(--primary-red);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .save-overall-evaluation-button:hover {
+            background-color: #a00000;
+        }
+
+        .empty-state-message {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .indicator-success {
+            color: #28a745;
+            font-weight: 600;
+        }
+
+        .indicator-fail {
+            color: #dc3545;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h2>Menu</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="daftar-relawan.html" data-tooltip="Daftar Relawan"><i
+                                class="fa-solid fa-table-columns nav-icon"></i>
+                            <span>Daftar Relawan</span></a>
+                    </li>
+                    <li><a href="pengajuan.html" data-tooltip="Pengajuan"><i
+                                class="fa-solid fa-file-import nav-icon"></i>
+                            <span>Pengajuan</span>
+                            <span class="notification-dot" id="pengajuan-notif-dot" style="display: none;"></span></a>
+                    </li>
+                    <li><a href="kegiatan.html" data-tooltip="Kegiatan"><i
+                                class="fa-solid fa-people-group nav-icon"></i>
+                            <span>Kegiatan</span></a></li>
+                    <li><a href="penjadwalan.html" data-tooltip="Penjadwalan"><i
+                                class="fa-solid fa-calendar-days nav-icon"></i>
+                            <span>Penjadwalan</span></a></li>
+                    <li class="active"><a href="evaluasi-main.html" data-tooltip="Evaluasi"><i
+                                class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <span>Evaluasi</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li><a href="#" id="admin-logout-button" data-tooltip="Logout"><i
+                                    class="fa-solid fa-right-from-bracket nav-icon"></i>
+                                <span>Logout</span></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Konten Utama -->
+        <main class="main-content">
+            <!-- Header Konten -->
+            <header class="main-header">
+                <div class="header-shape"></div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-email">admin@gmail.com</div>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Area Konten Dinamis -->
+            <section class="content-area">
+                <div class="section-header">
+                    <h2>Evaluasi Keseluruhan Kegiatan</h2>
+                </div>
+
+                <div class="filter-section">
+                    <div style="flex: 1;">
+                        <label for="activity-select">Pilih Kegiatan:</label>
+                        <select id="activity-select">
+                            <option value="">-- Pilih Kegiatan --</option>
+                            <!-- Activities will be loaded here -->
+                        </select>
+                    </div>
+                    <div class="filter-buttons">
+                        <button class="filter-button active" data-filter="all">Semua</button>
+                        <button class="filter-button" data-filter="belum_selesai">Belum Selesai</button>
+                        <button class="filter-button" data-filter="selesai">Selesai</button>
+                    </div>
+                </div>
+
+                <div id="evaluation-details-container" class="evaluation-details-card" style="display: none;">
+                    <h3>Detail Evaluasi Kegiatan <span id="activity-name-display"></span></h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <strong>Relawan Terlibat:</strong>
+                            <ul id="participating-volunteers-list">
+                                <!-- Volunteers will be listed here -->
+                            </ul>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Total Relawan Ditugaskan:</strong>
+                            <span id="total-volunteers">N/A</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Rasio Kehadiran:</strong>
+                            <span id="attendance-ratio">N/A</span>
+                        </div>
+                        <div class="detail-item">
+                            <strong>Performa Rata-rata Relawan:</strong>
+                            <span id="avg-performance">N/A</span>
+                        </div>
+                    </div>
+                    <div class="evaluation-summary-grid">
+                        <div class="chart-section">
+                            <h3>Persentase Keberhasilan</h3>
+                            <div class="success-chart-container">
+                                <div class="success-chart" id="success-chart" style="--percentage: 0;">
+                                    <span class="chart-percentage" id="chart-percentage-text">0%</span>
+                                </div>
+                                <div id="overall-success-indicator-badge" class="overall-success-badge"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <label for="conclusion-summary">Ringkasan Kesimpulan:</label>
+                    <textarea id="conclusion-summary" class="conclusion-textarea"
+                        placeholder="Tulis ringkasan evaluasi keseluruhan kegiatan..."></textarea>
+                    <button class="save-overall-evaluation-button" id="save-overall-evaluation-button">Simpan Evaluasi
+                        Keseluruhan</button>
+                </div>
+
+                <div id="no-activity-selected-message" class="empty-state-message">
+                    Pilih kegiatan untuk melihat detail evaluasi.
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // --- PENTING: Cek Autentikasi dan Role ---
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const loggedInUserRole = localStorage.getItem('loggedInUserRole');
+
+            if (!loggedInUser) {
+                alert('Anda harus login untuk mengakses dashboard.');
+                window.location.href = 'login.html';
+                return;
+            } else if (loggedInUserRole !== 'admin') {
+                alert('Akses ditolak. Anda tidak memiliki izin untuk melihat halaman ini.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // --- Sidebar Toggle Logic ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('shifted');
+            });
+
+            const activitySelect = document.getElementById('activity-select');
+            const filterButtons = document.querySelectorAll('.filter-button');
+            const evaluationDetailsContainer = document.getElementById('evaluation-details-container');
+            const noActivitySelectedMessage = document.getElementById('no-activity-selected-message');
+            const activityNameDisplay = document.getElementById('activity-name-display');
+            const participatingVolunteersList = document.getElementById('participating-volunteers-list');
+            const totalVolunteersSpan = document.getElementById('total-volunteers');
+            const attendanceRatioSpan = document.getElementById('attendance-ratio');
+            const avgPerformanceSpan = document.getElementById('avg-performance');
+            const overallSuccessIndicatorBadge = document.getElementById('overall-success-indicator-badge');
+            const successChart = document.getElementById('success-chart');
+            const chartPercentageText = document.getElementById('chart-percentage-text');
+            const conclusionSummaryTextarea = document.getElementById('conclusion-summary');
+            const saveOverallEvaluationButton = document.getElementById('save-overall-evaluation-button');
+
+            // --- Logout Logic ---
+            const adminLogoutButton = document.getElementById('admin-logout-button');
+            if (adminLogoutButton) {
+                adminLogoutButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    localStorage.removeItem('loggedInUserRole');
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // --- Check Admin Notifications for Sidebar Dot ---
+            function checkAdminNotifications() {
+                const pengajuanNotifDot = document.getElementById('pengajuan-notif-dot');
+                const adminNotifications = JSON.parse(localStorage.getItem('adminNotificationsData') || '[]');
+                const hasUnreadNotifications = adminNotifications.some(
+                    notif => (notif.type === 'resignation' || notif.type === 'new_applicant') && !notif.read
+                );
+
+                if (hasUnreadNotifications && pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'block';
+                } else if (pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'none';
+                }
+            }
+
+            // Initial check on page load
+            checkAdminNotifications();
+
+            let currentActivityFilter = 'all';
+
+            // --- Data Loading Functions ---
+            async function loadActivities() {
+                let activities = JSON.parse(localStorage.getItem('activitiesData'));
+                // [NEW] Return empty array if no data
+                return activities || [];
+            }
+
+            async function loadApplicants() {
+                let applicants = JSON.parse(localStorage.getItem('applicantsData'));
+                return applicants || [];
+            }
+
+            async function loadAssignments() {
+                let assignments = JSON.parse(localStorage.getItem('assignmentsData'));
+                return assignments || [];
+            }
+
+            async function loadVolunteerEvaluations() {
+                let evaluations = JSON.parse(localStorage.getItem('volunteerEvaluationsData'));
+                return evaluations || [];
+            }
+
+            async function loadOverallEvaluations() {
+                let overallEvaluations = JSON.parse(localStorage.getItem('overallEvaluationsData'));
+                return overallEvaluations || [];
+            }
+
+            function saveOverallEvaluations(overallEvaluations) {
+                localStorage.setItem('overallEvaluationsData', JSON.stringify(overallEvaluations));
+            }
+
+            function saveAssignments(assignments) {
+                localStorage.setItem('assignmentsData', JSON.stringify(assignments));
+            }
+
+            // [REVISED] Automatically update assignment statuses
+            async function updateAssignmentStatuses() {
+                let assignments = await loadAssignments();
+                let wasUpdated = false;
+                const now = new Date();
+                const thirtyMinutesInMs = 30 * 60 * 1000;
+                const oneHourInMs = 60 * 60 * 1000;
+
+                assignments.forEach(assignment => {
+                    // Logic 1: 'terjadwal' -> 'ongoing'
+                    if (assignment.status === 'terjadwal') {
+                        const timeParts = (assignment.time || '00:00').split(' - ');
+                        const startTimeString = timeParts[0].trim();
+                        const activityStartDateTime = new Date(`${assignment.date}T${startTimeString}`);
+
+                        if (activityStartDateTime.getTime() - now.getTime() <= thirtyMinutesInMs) {
+                            assignment.status = 'ongoing';
+                            wasUpdated = true;
+                        }
+                    }
+
+                    // Logic 2: 'ongoing' -> 'completed'
+                    if (assignment.status === 'ongoing') {
+                        const timeParts = (assignment.time || '00:00').split(' - ');
+                        if (timeParts.length > 1) {
+                            const endTimeString = timeParts[1].trim();
+                            const activityEndDateTime = new Date(`${assignment.date}T${endTimeString}`);
+
+                            if (now.getTime() > (activityEndDateTime.getTime() + oneHourInMs)) {
+                                assignment.status = 'completed';
+                                wasUpdated = true;
+                            }
+                        }
+                    }
+                });
+
+                if (wasUpdated) {
+                    saveAssignments(assignments);
+                }
+                return wasUpdated; // Return true if any status was changed
+            }
+
+            // --- Populate Activity Dropdown ---
+            async function populateActivityDropdown() {
+                const activities = await loadActivities();
+                const assignments = await loadAssignments(); // Load assignments to filter activities
+                activitySelect.innerHTML = '<option value="">-- Pilih Kegiatan --</option>';
+
+                const ongoingActivityIds = new Set();
+                const completedActivityIds = new Set();
+                const allAssignedActivityIds = new Set();
+
+                assignments.forEach(assign => {
+                    allAssignedActivityIds.add(assign.activity_id);
+                    if (assign.status === 'ongoing') {
+                        ongoingActivityIds.add(assign.activity_id);
+                    } else if (assign.status === 'completed') {
+                        completedActivityIds.add(assign.activity_id);
+                    }
+                });
+
+                const activitiesToDisplay = activities.filter(activity => {
+                    if (currentActivityFilter === 'all') return allAssignedActivityIds.has(activity.id);
+                    if (currentActivityFilter === 'belum_selesai') return ongoingActivityIds.has(activity.id);
+                    if (currentActivityFilter === 'selesai') return completedActivityIds.has(activity.id);
+                    return false; // Should not happen
+                });
+
+                activitiesToDisplay.forEach(activity => {
+                    const option = document.createElement('option');
+                    option.value = activity.id;
+                    option.textContent = `${activity.nama_kegiatan} (${new Date(activity.tanggal).toLocaleDateString('id-ID')})`;
+                    activitySelect.appendChild(option);
+                });
+            }
+
+            // --- Render Overall Evaluation Details ---
+            async function renderOverallEvaluationDetails(activityId) {
+                evaluationDetailsContainer.style.display = 'none';
+                noActivitySelectedMessage.innerHTML = 'Pilih kegiatan untuk melihat detail evaluasi.'; // Reset message
+
+                if (!activityId) {
+                    return;
+                }
+
+                const activities = await loadActivities();
+                const applicants = await loadApplicants();
+                const assignments = await loadAssignments();
+                const volunteerEvaluations = await loadVolunteerEvaluations();
+                const overallEvaluations = await loadOverallEvaluations();
+
+                const activity = activities.find(act => act.id === activityId);
+                const assignment = assignments.find(assign => assign.activity_id === activityId);
+                const existingOverallEvaluation = overallEvaluations.find(eval => eval.activity_id === activityId);
+
+                if (!activity || !assignment) {
+                    noActivitySelectedMessage.textContent = 'Kegiatan tidak ditemukan atau belum dijadwalkan.';
+                    noActivitySelectedMessage.style.display = 'block';
+                    return;
+                }
+
+                // Check if the activity is still scheduled and lock evaluation if so
+                if (assignment.status === 'terjadwal') {
+                    noActivitySelectedMessage.innerHTML = `<i class="fas fa-lock" style="margin-right: 8px;"></i>Evaluasi untuk kegiatan ini belum dibuka. Evaluasi dapat dilakukan saat kegiatan sedang berlangsung atau telah selesai.`;
+                    noActivitySelectedMessage.style.display = 'block';
+                    return;
+                }
+
+                noActivitySelectedMessage.style.display = 'none';
+                evaluationDetailsContainer.style.display = 'block';
+
+                activityNameDisplay.textContent = activity.nama_kegiatan;
+
+                // Total Assigned Volunteers
+                const totalAssignedVolunteers = assignment ? assignment.assigned_volunteer_ids.length : 0;
+                totalVolunteersSpan.textContent = totalAssignedVolunteers > 0 ? `${totalAssignedVolunteers} orang` : 'N/A';
+
+                // Participating Volunteers
+                participatingVolunteersList.innerHTML = '';
+                if (assignment && assignment.assigned_volunteer_ids.length > 0) {
+                    assignment.assigned_volunteer_ids.forEach(volId => {
+                        const volunteer = applicants.find(app => app.id === volId);
+                        if (volunteer) {
+                            const li = document.createElement('li');
+                            li.textContent = volunteer.name;
+                            participatingVolunteersList.appendChild(li);
+                        }
+                    });
+                } else {
+                    const li = document.createElement('li');
+                    li.textContent = 'Tidak ada relawan yang ditugaskan.';
+                    participatingVolunteersList.appendChild(li);
+                }
+
+                // Average Volunteer Performance
+                let totalScore = 0;
+                let evaluatedVolunteersCount = 0;
+                if (assignment && assignment.assigned_volunteer_ids.length > 0) {
+                    assignment.assigned_volunteer_ids.forEach(volId => {
+                        const evalForVol = volunteerEvaluations.find(eval => eval.activity_id === activityId && eval.volunteer_id === volId);
+                        if (evalForVol) {
+                            const avgRating = (evalForVol.kedisiplinan + evalForVol.komunikasi + evalForVol.kerjasama + evalForVol.tanggung_jawab) / 4;
+                            totalScore += avgRating;
+                            evaluatedVolunteersCount++;
+                        }
+                    });
+                }
+                const avgPerformance = evaluatedVolunteersCount > 0 ? (totalScore / evaluatedVolunteersCount).toFixed(1) : 'N/A';
+                avgPerformanceSpan.textContent = avgPerformance !== 'N/A' ? `${(avgPerformance / 5 * 100).toFixed(0)}% (${avgPerformance}/5)` : 'N/A';
+
+                // Calculate actual Attendance Ratio
+                let presentVolunteersCount = 0;
+
+                if (totalAssignedVolunteers > 0) {
+                    assignment.assigned_volunteer_ids.forEach(volId => {
+                        const evalForVol = volunteerEvaluations.find(eval => eval.activity_id === activityId && eval.volunteer_id === volId);
+                        if (evalForVol && evalForVol.is_present) {
+                            presentVolunteersCount++;
+                        }
+                    });
+                    const calculatedRatio = (presentVolunteersCount / totalAssignedVolunteers * 100).toFixed(0);
+                    attendanceRatioSpan.textContent = `${calculatedRatio}% (${presentVolunteersCount}/${totalAssignedVolunteers} Hadir)`;
+                } else {
+                    attendanceRatioSpan.textContent = 'N/A (Tidak ada relawan ditugaskan)';
+                }
+
+                // --- Automatic Success Calculation ---
+                const overallSuccessPercentage = calculateOverallSuccessPercentage(avgPerformance, attendanceRatioSpan.textContent);
+                updateSuccessMetrics(overallSuccessPercentage);
+
+                // Conclusion Summary
+                conclusionSummaryTextarea.value = existingOverallEvaluation ? (existingOverallEvaluation.kesimpulan || '') : '';
+
+                // Disable form if evaluation is already saved
+                if (existingOverallEvaluation) {
+                    conclusionSummaryTextarea.disabled = true;
+                    saveOverallEvaluationButton.disabled = true;
+                    saveOverallEvaluationButton.textContent = 'Sudah Dievaluasi';
+                } else {
+                    conclusionSummaryTextarea.disabled = false;
+                    saveOverallEvaluationButton.disabled = false;
+                    saveOverallEvaluationButton.textContent = 'Simpan Evaluasi Keseluruhan';
+                }
+            }
+
+            // --- Handle Save Overall Evaluation ---
+            saveOverallEvaluationButton.addEventListener('click', async function () {
+                const activityId = activitySelect.value;
+                if (!activityId) {
+                    alert('Mohon pilih kegiatan terlebih dahulu.');
+                    return;
+                }
+
+                // Get indicator from the badge's current state
+                const indicator = overallSuccessIndicatorBadge.textContent.toLowerCase().replace(' ', '_');
+
+                const kesimpulan = conclusionSummaryTextarea.value.trim();
+
+                if (!kesimpulan) {
+                    alert('Mohon lengkapi Ringkasan Kesimpulan.');
+                    return;
+                }
+
+                let overallEvaluations = await loadOverallEvaluations();
+                const existingIndex = overallEvaluations.findIndex(eval => eval.activity_id === activityId);
+
+                const newOverallEvaluation = {
+                    id: existingIndex > -1 ? overallEvaluations[existingIndex].id : 'overall-eval-' + Date.now(),
+                    activity_id: activityId,
+                    indicator: indicator,
+                    kesimpulan: kesimpulan,
+                    evaluated_at: new Date().toISOString(),
+                    attendance_ratio: attendanceRatioSpan.textContent // Capture current displayed ratio
+                };
+
+                if (existingIndex > -1) {
+                    overallEvaluations[existingIndex] = newOverallEvaluation;
+                    alert('Evaluasi keseluruhan berhasil diperbarui!');
+                } else {
+                    overallEvaluations.push(newOverallEvaluation);
+                    alert('Evaluasi keseluruhan berhasil disimpan!');
+                }
+                saveOverallEvaluations(overallEvaluations);
+                // Re-render to disable fields after saving
+                renderOverallEvaluationDetails(activityId);
+            });
+
+            // Helper function to calculate overall success percentage
+            function calculateOverallSuccessPercentage(avgPerformance, attendanceRatioText) {
+                let performancePercent = 0;
+                if (avgPerformance !== 'N/A') {
+                    performancePercent = (parseFloat(avgPerformance) / 5) * 100;
+                }
+
+                let attendancePercent = 0;
+                if (attendanceRatioText.includes('%')) {
+                    attendancePercent = parseFloat(attendanceRatioText);
+                }
+                return (performancePercent * 0.6) + (attendancePercent * 0.4);
+            }
+
+            // --- Event Listeners ---
+            activitySelect.addEventListener('change', function () {
+                renderOverallEvaluationDetails(this.value);
+            });
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    currentActivityFilter = this.dataset.filter;
+
+                    const oldSelectedActivityId = activitySelect.value; // Simpan ID kegiatan yang sedang dipilih
+
+                    populateActivityDropdown(); // Isi ulang dropdown berdasarkan filter baru
+
+                    // Periksa apakah kegiatan yang sebelumnya dipilih masih ada di dropdown yang baru difilter
+                    if (oldSelectedActivityId && activitySelect.querySelector(`option[value="${oldSelectedActivityId}"]`)) {
+                        activitySelect.value = oldSelectedActivityId; // Pastikan kegiatan tersebut tetap terpilih
+                        renderOverallEvaluationDetails(oldSelectedActivityId); // Tampilkan kembali detailnya
+                    } else {
+                        activitySelect.value = ''; // Reset pilihan dropdown
+                        renderOverallEvaluationDetails(''); // Kosongkan detail dan tampilkan pesan default
+                    }
+                });
+            });
+
+            // --- [NEW] Function to update the success chart and indicators ---
+            function updateSuccessMetrics(percentage) {
+                const roundedPercentage = Math.round(percentage);
+                let chartColor = '#dc3545'; // Default: Red (Gagal)
+                let indicatorText = 'Gagal';
+                let badgeClass = 'badge-fail';
+
+                if (roundedPercentage >= 75) {
+                    chartColor = '#28a745'; // Green
+                    indicatorText = 'Berhasil';
+                    badgeClass = 'badge-success';
+                } else if (roundedPercentage >= 50) {
+                    chartColor = '#ffc107'; // Orange/Yellow
+                    indicatorText = 'Normal';
+                    badgeClass = 'badge-medium';
+                }
+
+                // Update chart visuals
+                successChart.style.setProperty('--percentage', roundedPercentage);
+                successChart.style.setProperty('--chart-color', chartColor);
+                chartPercentageText.textContent = `${roundedPercentage}%`;
+
+                // Update overall success badge
+                overallSuccessIndicatorBadge.textContent = indicatorText;
+                overallSuccessIndicatorBadge.className = `overall-success-badge ${badgeClass}`;
+            }
+
+            // --- Initial Load ---
+            // Update statuses before rendering anything
+            const updatedStatus = await updateAssignmentStatuses();
+            if (updatedStatus) { // Re-render dropdown if any status changed
+                await populateActivityDropdown();
+            } else {
+                await populateActivityDropdown();
+            }
+
+            // Set an interval to check statuses every minute (60000 ms)
+            setInterval(async () => {
+                const updated = await updateAssignmentStatuses();
+                if (updated) {
+                    const currentSelectedActivity = activitySelect.value;
+                    await populateActivityDropdown(); // Re-populate dropdown to reflect status changes
+                    activitySelect.value = currentSelectedActivity; // Try to keep the same activity selected
+                    renderOverallEvaluationDetails(currentSelectedActivity); // Re-render details if an activity was selected
+                }
+            }, 60000);
+        });
+    </script>
+
+</body>
+
+</html>

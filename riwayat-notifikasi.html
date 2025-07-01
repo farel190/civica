@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Notifikasi - CivicaCare</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6A38C2;
+            --dark-text: #1a202c;
+            --light-text: #555;
+            --border-color: #e2e8f0;
+            --unread-bg: #f0ebf9;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .bg-image {
+            background-image: url('bg.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 100%;
+        }
+
+        .detail-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+        }
+
+        .detail-card {
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px 40px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: var(--dark-text);
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .notification-item {
+            display: flex;
+            /* Use flexbox for layout */
+            align-items: flex-start;
+            /* Align items to the top */
+            gap: 10px;
+            /* Reduced gap between icon and content */
+            padding: 12px 15px;
+            /* Reduced padding */
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .notification-item.unread {
+            background-color: var(--unread-bg);
+            border-left: 5px solid var(--primary-color);
+            font-weight: 500;
+            /* Make unread items slightly bolder */
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+            /* Smaller icon size */
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+
+        .notification-content h3 {
+            margin: 0 0 5px 0;
+            font-size: 1rem;
+            /* Smaller title font size */
+            color: var(--dark-text);
+        }
+
+        .notification-content p {
+            margin: 0;
+            color: var(--light-text);
+            font-size: 0.85rem;
+            /* Smaller message font size */
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: var(--light-text);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        /* === Pagination Controls === */
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .pagination-button {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--light-text);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .pagination-button:hover:not(:disabled) {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-button.active {
+            background-color: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        .pagination-button:disabled {
+            background-color: #f8f9fa;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* === Action Buttons === */
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            color: var(--light-text);
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .action-button:hover {
+            background-color: var(--primary-light);
+        }
+    </style>
+</head>
+
+<body class="bg-image">
+    <div class="detail-container">
+        <div class="detail-card">
+            <div class="card-header">
+                <h2>Riwayat Notifikasi</h2>
+                <a href="dashboard-relawan.html" class="back-button"><i class="fas fa-arrow-left"></i> Kembali</a>
+            </div>
+            <div id="notification-list" class="notification-list">
+                <!-- Notifications will be injected here by JavaScript -->
+                <div class="empty-state" id="empty-notification-message" style="display: none;">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>Tidak ada notifikasi saat ini.</p>
+                </div>
+            </div>
+            <!-- Action buttons -->
+            <div class="action-buttons" id="action-buttons" style="display: none;">
+                <button class="action-button" id="delete-all">Hapus Semua</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const notificationListContainer = document.getElementById('notification-list');
+            const emptyMessage = document.getElementById('empty-notification-message');
+            const actionButtons = document.getElementById('action-buttons');
+            const deleteAllButton = document.getElementById('delete-all');
+
+            const maxNotifications = 5; // Batasi tampilan 5 notifikasi teratas
+
+            if (!loggedInUser) {
+                emptyMessage.style.display = 'block';
+                return;
+            }
+
+            let notificationKey = 'userNotifications_' + loggedInUser;
+
+            // Delete All Notifications
+            deleteAllButton.addEventListener('click', function () {
+                if (confirm('Apakah Anda yakin ingin menghapus SEMUA notifikasi?')) {
+                    // [NEW] Hapus notifikasi dari localStorage
+                    localStorage.removeItem(notificationKey);
+                    // Refresh tampilan
+                    displayNotifications();
+                }
+            });
+
+            function displayNotifications() {
+                notificationListContainer.innerHTML = ''; // Clear existing list
+                actionButtons.style.display = 'none'; // Hide action buttons initially
+
+                // Re-fetch notifications after potential deletion
+                let notificationsData = JSON.parse(localStorage.getItem(notificationKey) || '[]');
+                // Tandai semua notifikasi sebagai sudah dibaca saat ditampilkan di halaman riwayat
+                notificationsData.forEach(notif => notif.read = true);
+                localStorage.setItem(notificationKey, JSON.stringify(notificationsData));
+
+                // Get the latest notifications and reverse to show newest at top
+                // notificationsData is assumed to be ordered oldest to newest (due to push)
+                const latestNotifications = notificationsData.slice(-maxNotifications); // Get the last 5 (newest)
+                const displayedNotifications = latestNotifications.reverse(); // Reverse to show newest at top
+
+                if (displayedNotifications.length === 0) {
+                    emptyMessage.style.display = 'block';
+                } else {
+                    emptyMessage.style.display = 'none';
+                    actionButtons.style.display = 'flex'; // Show action buttons
+
+                    displayedNotifications.forEach((notif) => {
+                        const item = document.createElement('div');
+                        item.className = 'notification-item'; // No need for 'unread' class here as all are marked read
+
+                        let iconClass = 'fa-solid fa-info-circle';
+                        if (notif.type === 'form_accepted') iconClass = 'fa-solid fa-file-circle-check';
+                        else if (notif.type === 'form_accepted_admin') iconClass = 'fa-solid fa-circle-check'; // Notifikasi diterima admin
+                        else if (notif.type === 'assignment_reminder') iconClass = 'fa-solid fa-bell'; // Notifikasi pengingat penugasan
+                        else if (notif.type === 'new_assignment') iconClass = 'fa-solid fa-calendar-plus'; // Notifikasi penugasan baru (sudah ada)
+                        else if (notif.type === 'new_evaluation') iconClass = 'fa-solid fa-star-half-stroke'; // Notifikasi evaluasi baru (sudah ada)
+                        else if (notif.type === 'new_assignment') iconClass = 'fa-solid fa-calendar-check';
+                        else if (notif.type === 'new_evaluation') iconClass = 'fa-solid fa-star';
+                        else if (notif.type === 'coordinator_appointment') iconClass = 'fa-solid fa-bullhorn';
+
+                        item.innerHTML = `
+                            <div class="notification-icon">
+                                <i class="${iconClass}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <h3>${notif.title}</h3>
+                                <p>${notif.message}</p>
+                            </div>
+                        `;
+                        notificationListContainer.appendChild(item);
+                    });
+                }
+            }
+
+            // Initial display
+            displayNotifications();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,108 @@
+[
+    {
+        "id": "app-001",
+        "name": "Budi Santoso",
+        "nik": "3301011234567890",
+        "phone": "081234567890",
+        "email": "budi@gmail.com",
+        "address": "Jl. Merdeka No. 10, Jakarta",
+        "education": "S1/D4",
+        "availability": [
+            "senin",
+            "selasa",
+            "rabu",
+            "kamis",
+            "jumat"
+        ],
+        "status": "diterima"
+    },
+    {
+        "id": "app-002",
+        "name": "Siti Aminah",
+        "nik": "3302029876543210",
+        "phone": "087654321098",
+        "email": "siti.a@example.com",
+        "address": "Jl. Pahlawan No. 25, Bandung",
+        "education": "SMA/SMK",
+        "availability": [
+            "selasa",
+            "rabu",
+            "kamis",
+            "jumat",
+            "sabtu"
+        ],
+        "status": "diseleksi"
+    },
+    {
+        "id": "app-003",
+        "name": "Joko Susilo",
+        "nik": "3303031122334455",
+        "phone": "085511223344",
+        "email": "joko@gmail.com",
+        "address": "Jl. Diponegoro No. 5, Surabaya",
+        "education": "D3",
+        "availability": [
+            "minggu",
+            "senin",
+            "selasa",
+            "rabu",
+            "kamis",
+            "jumat",
+            "sabtu"
+        ],
+        "status": "diterima",
+        "role": "relawan"
+    },
+    {
+        "id": "app-004",
+        "name": "Maria Ulfa",
+        "nik": "3304045566778899",
+        "phone": "089988776655",
+        "email": "maria.u@example.com",
+        "address": "Jl. Gajah Mada No. 1, Yogyakarta",
+        "education": "S2",
+        "availability": [
+            "senin",
+            "selasa",
+            "rabu",
+            "kamis",
+            "jumat"
+        ],
+        "status": "diterima",
+        "role": "relawan"
+    },
+    {
+        "id": "app-005",
+        "name": "Ahmad Fauzi",
+        "nik": "3305051122334455",
+        "phone": "081122334455",
+        "email": "ahmad.f@example.com",
+        "address": "Jl. Kenanga No. 7, Semarang",
+        "education": "S1/D4",
+        "availability": [
+            "senin",
+            "selasa",
+            "kamis",
+            "jumat",
+            "sabtu"
+        ],
+        "status": "diajukan"
+    },
+    {
+        "id": "app-006",
+        "name": "Dewi Sartika",
+        "nik": "3306069988776655",
+        "phone": "087766554433",
+        "email": "dewi.s@example.com",
+        "address": "Jl. Melati No. 12, Malang",
+        "education": "SMA/SMK",
+        "availability": [
+            "rabu",
+            "jumat",
+            "sabtu",
+            "minggu",
+            "senin"
+        ],
+        "status": "diajukan"
+    }
+]

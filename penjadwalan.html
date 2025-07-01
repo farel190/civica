@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penjadwalan Kegiatan - CivicaCare Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+    <style>
+        /* === Pengaturan Dasar === */
+        :root {
+            --primary-red: #C70000;
+            --bg-light: #F8F9FA;
+            --text-dark: #212529;
+            --text-light: #f8f9fa;
+            --border-color: #dee2e6;
+            --primary-color: #6A38C2;
+            /* Added for consistency */
+            --primary-light: #F0EBf9;
+            /* Ungu Muda */
+            --secondary-color: #CC0000;
+            /* Merah */
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* === Sidebar (Kiri) === */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-red);
+            color: var(--text-light);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s ease;
+            position: relative;
+            /* Ensure z-index works */
+            z-index: 10;
+            /* Make sure it's above main content */
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            /* Lebar saat disembunyikan */
+        }
+
+        .sidebar.collapsed .sidebar-header h2,
+        .sidebar.collapsed .sidebar-nav li a span,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+            /* Sembunyikan teks */
+        }
+
+        .sidebar.collapsed .sidebar-header {
+            padding-bottom: 10px;
+            /* Make header more compact when collapsed */
+            margin-bottom: 10px;
+            /* Reduce space below header when collapsed */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+            justify-content: flex-start;
+            /* Align items to start */
+        }
+
+        #menu-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 10px;
+            /* Space between toggle and title */
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 10px;
+            border-radius: 8px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            position: relative;
+            /* Diperlukan untuk positioning dot dan tooltip */
+        }
+
+        .sidebar-nav li a:hover,
+        .sidebar-nav li.active a {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar-nav li a .nav-icon {
+            font-size: 1.2rem;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            /* Prevent icon from shrinking */
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            /* Mendorong logout ke bawah */
+        }
+
+        .sidebar-nav .notification-dot {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            background-color: #ffc107;
+            /* Kuning untuk perhatian */
+            border-radius: 50%;
+            border: 2px solid var(--primary-red);
+        }
+
+        /* Tooltip styles for collapsed sidebar */
+        .sidebar.collapsed .sidebar-nav li a::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #212529;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 20;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+        }
+
+        .sidebar.collapsed .sidebar-nav li a:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transition-delay: 0.3s;
+        }
+
+        /* === Konten Utama === */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.shifted {
+            /* margin-left: -180px; */
+            /* Removed: flex-grow handles the shift */
+        }
+
+        .main-content .main-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-shape {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 350px;
+            height: 100%;
+            background-color: var(--primary-red);
+            clip-path: polygon(15% 0, 100% 0, 100% 100%, 0% 100%);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #495057;
+            font-size: 1.5rem;
+        }
+
+        .user-info {
+            color: var(--text-light);
+            text-align: right;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+        }
+
+        .user-info .user-email {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .content-area {
+            padding: 40px;
+            flex-grow: 1;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .section-header h2 {
+            font-size: 2rem;
+            margin: 0;
+            color: var(--primary-red);
+        }
+
+        /* === Form Penjadwalan === */
+        .scheduling-form-card {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        .scheduling-form-card h3 {
+            font-size: 1.5rem;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px 20px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+            /* Adjusted for grid gap */
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group select,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .form-group.span-two-columns {
+            grid-column: span 2;
+        }
+
+        /* Multi-select for volunteers */
+        .multi-select-container {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            min-height: 100px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #fff;
+        }
+
+        .multi-select-container label {
+            display: block;
+            margin-bottom: 5px;
+            cursor: pointer;
+            padding: 5px 0;
+            font-weight: normal;
+            /* Override form-group label */
+        }
+
+        .multi-select-container label:hover {
+            background-color: #f1f1f1;
+        }
+
+        .multi-select-container input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .multi-select-container input[type="checkbox"]:disabled+span {
+            color: #aaa;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+
+        .form-actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .assign-button {
+            background-color: var(--primary-red);
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .assign-button:hover {
+            background-color: #a00000;
+        }
+
+        /* === Table Styles === */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 40px;
+            /* More space from form */
+            background-color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--primary-red);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+        }
+
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-buttons-cell {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .button-delete {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .button-delete:hover {
+            background-color: #c82333;
+        }
+
+        .empty-table-message {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        /* === NEW: Status Badges === */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-terjadwal {
+            background-color: #007bff;
+            /* Blue */
+            color: #fff;
+        }
+
+        .status-ongoing {
+            background-color: #ffc107;
+            /* Yellow */
+            color: #343a40;
+        }
+
+        .status-completed {
+            background-color: #28a745;
+            /* Green */
+            color: #fff;
+        }
+
+        /* === NEW: Styling for completed rows === */
+        .assignment-completed {
+            opacity: 0.7;
+            background-color: #f8f9fa;
+            /* Lighter background for completed rows */
+        }
+
+        .assignment-completed td {
+            color: #6c757d;
+            /* Gray out text */
+        }
+
+        /* === NEW: Button Complete === */
+        .button-complete {
+            background-color: #007bff;
+            /* Blue */
+            color: #fff;
+        }
+
+        .button-complete:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <button id="menu-toggle"><i class="fa-solid fa-bars"></i></button>
+                <h2>Menu</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="daftar-relawan.html" data-tooltip="Daftar Relawan"><i
+                                class="fa-solid fa-table-columns nav-icon"></i>
+                            <span>Daftar Relawan</span></a>
+                    </li>
+                    <li><a href="pengajuan.html" data-tooltip="Pengajuan"><i
+                                class="fa-solid fa-file-import nav-icon"></i>
+                            <span>Pengajuan</span>
+                            <span class="notification-dot" id="pengajuan-notif-dot" style="display: none;"></span></a>
+                    </li>
+                    <li><a href="kegiatan.html" data-tooltip="Kegiatan"><i
+                                class="fa-solid fa-people-group nav-icon"></i>
+                            <span>Kegiatan</span></a></li>
+                    <li class="active"><a href="penjadwalan.html" data-tooltip="Penjadwalan"><i
+                                class="fa-solid fa-calendar-days nav-icon"></i>
+                            <span>Penjadwalan</span></a></li>
+                    <li><a href="evaluasi-main.html" data-tooltip="Evaluasi"><i
+                                class="fa-solid fa-pen-to-square nav-icon"></i>
+                            <span>Evaluasi</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li><a href="#" id="admin-logout-button" data-tooltip="Logout"><i
+                                    class="fa-solid fa-right-from-bracket nav-icon"></i>
+                                <span>Logout</span></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Konten Utama -->
+        <main class="main-content">
+            <!-- Header Konten -->
+            <header class="main-header">
+                <div class="header-shape"></div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <div class="user-name">Admin</div>
+                        <div class="user-email">admin@gmail.com</div>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Area Konten Dinamis -->
+            <section class="content-area">
+                <div class="section-header">
+                    <h2>Penjadwalan Kegiatan Relawan</h2>
+                </div>
+
+                <div class="scheduling-form-card">
+                    <h3>Tetapkan Penugasan Baru</h3>
+                    <form id="assignment-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="activity-select">Pilih Kegiatan</label>
+                                <select id="activity-select" required>
+                                    <option value="">-- Pilih Kegiatan --</option>
+                                    <!-- Activities will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="coordinator-select">Pilih Koordinator Lapangan</label>
+                                <select id="coordinator-select" required>
+                                    <option value="">-- Pilih Koordinator --</option>
+                                    <!-- Coordinators will be loaded here -->
+                                </select>
+                            </div>
+                            <div class="form-group span-two-columns">
+                                <label>Pilih Relawan <span id="volunteer-quota-info"
+                                        style="font-weight: normal; font-size: 0.9em;"></span></label>
+                                <div id="volunteer-checklist" class="multi-select-container">
+                                    <!-- Volunteers will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="assign-button"><i class="fas fa-check-circle"></i> Tetapkan
+                                Penugasan</button>
+                        </div>
+                    </form>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Kegiatan</th>
+                            <th>Tanggal</th>
+                            <th>Waktu</th>
+                            <th>Koordinator</th>
+                            <th>Relawan Ditugaskan</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignments-table-body">
+                        <!-- Data penugasan akan dimuat di sini oleh JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            // --- PENTING: Cek Autentikasi dan Role ---
+            const loggedInUser = localStorage.getItem('loggedInUser');
+            const loggedInUserRole = localStorage.getItem('loggedInUserRole');
+
+            if (!loggedInUser) {
+                alert('Anda harus login untuk mengakses dashboard.');
+                window.location.href = 'login.html';
+                return;
+            } else if (loggedInUserRole !== 'admin') {
+                alert('Akses ditolak. Anda tidak memiliki izin untuk melihat halaman ini.');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // --- Sidebar Toggle Logic ---
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            menuToggle.addEventListener('click', function () {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('shifted');
+            });
+
+            const activitySelect = document.getElementById('activity-select');
+            const coordinatorSelect = document.getElementById('coordinator-select');
+            const volunteerChecklist = document.getElementById('volunteer-checklist');
+            const assignmentForm = document.getElementById('assignment-form');
+            const assignmentsTableBody = document.getElementById('assignments-table-body');
+            const volunteerQuotaInfo = document.getElementById('volunteer-quota-info');
+
+            // --- Data Loading Functions ---
+            async function loadActivities() {
+                return JSON.parse(localStorage.getItem('activitiesData') || '[]');
+            }
+
+            async function loadApplicants() {
+                return JSON.parse(localStorage.getItem('applicantsData') || '[]');
+            }
+
+            async function loadAssignments() {
+                return JSON.parse(localStorage.getItem('assignmentsData') || '[]');
+            }
+
+            function saveAssignments(assignments) {
+                localStorage.setItem('assignmentsData', JSON.stringify(assignments));
+            }
+
+            // --- Helper Functions ---
+            function getDayOfWeekString(dateString) {
+                const date = new Date(dateString);
+                const days = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+                return days[date.getDay()];
+            }
+
+            function resetVolunteerChecklist() {
+                volunteerChecklist.innerHTML = '<p class="empty-table-message">Pilih kegiatan terlebih dahulu untuk melihat relawan yang tersedia.</p>';
+                volunteerQuotaInfo.textContent = '';
+            }
+
+            // --- Populate Dropdowns/Checklists ---
+            async function populateActivityDropdown() {
+                const activities = await loadActivities();
+                const assignments = await loadAssignments();
+
+                // Get IDs of activities that currently have 'terjadwal' or 'ongoing' assignments
+                const activeAssignedActivityIds = new Set(
+                    assignments.filter(a => a.status === 'terjadwal' || a.status === 'ongoing')
+                        .map(a => a.activity_id)
+                );
+
+                activitySelect.innerHTML = '<option value="">-- Pilih Kegiatan --</option>';
+                activities.forEach(activity => {
+                    // Only display activities that are not currently 'terjadwal' or 'ongoing'
+                    // This allows re-scheduling of completed activities
+                    if (!activeAssignedActivityIds.has(activity.id)) {
+                        const option = document.createElement('option');
+                        option.value = activity.id;
+                        // Add status if it has completed assignments, for clarity
+                        const hasCompletedAssignment = assignments.some(a => a.activity_id === activity.id && a.status === 'completed');
+                        option.textContent = activity.nama_kegiatan + (hasCompletedAssignment ? ' (Sudah Pernah Selesai)' : '');
+                        activitySelect.appendChild(option);
+                    }
+                });
+            }
+
+            async function populateCoordinatorDropdown(activityDate = null) {
+                const applicants = await loadApplicants();
+                let coordinators = applicants.filter(app => app.status === 'diterima' && app.role === 'koordinator');
+
+                coordinatorSelect.innerHTML = '<option value="">-- Pilih Koordinator --</option>';
+
+                if (!activityDate) {
+                    coordinatorSelect.innerHTML = '<option value="">-- Pilih Kegiatan Dulu --</option>';
+                    return;
+                }
+
+                const dayOfWeek = getDayOfWeekString(activityDate);
+                coordinators = coordinators.filter(coord =>
+                    coord.availability && coord.availability.includes(dayOfWeek)
+                );
+
+                if (coordinators.length === 0) {
+                    coordinatorSelect.innerHTML = '<option value="">Tidak ada koordinator tersedia.</option>';
+                    return;
+                }
+
+                coordinators.forEach(coord => {
+                    const option = document.createElement('option');
+                    option.value = coord.id;
+                    option.textContent = `${coord.name} (${coord.availability.map(d => d.charAt(0).toUpperCase() + d.slice(1)).join(', ')})`;
+                    coordinatorSelect.appendChild(option);
+                });
+            }
+
+            async function populateVolunteerChecklist(activityDate = null, kuota = 0) {
+                const applicants = await loadApplicants();
+                let volunteers = applicants.filter(app => app.status === 'diterima' && app.role !== 'koordinator');
+
+                if (!activityDate) {
+                    resetVolunteerChecklist();
+                    return;
+                }
+
+                const dayOfWeek = getDayOfWeekString(activityDate);
+                volunteers = volunteers.filter(volunteer =>
+                    volunteer.availability && volunteer.availability.includes(dayOfWeek)
+                );
+
+                const maxVolunteers = kuota > 0 ? kuota - 1 : 0;
+                volunteerQuotaInfo.textContent = `(Maksimal ${maxVolunteers} relawan dari ${kuota} total kuota)`;
+
+                volunteerChecklist.innerHTML = '';
+                if (volunteers.length === 0) {
+                    volunteerChecklist.innerHTML = '<p class="empty-table-message">Tidak ada relawan yang tersedia untuk hari ini.</p>';
+                    return;
+                }
+
+                volunteers.forEach(volunteer => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `
+                        <input type="checkbox" name="volunteers" value="${volunteer.id}" data-name="${volunteer.name}">
+                        <span>${volunteer.name} (${volunteer.availability.join(', ')})</span>
+                    `;
+                    volunteerChecklist.appendChild(label);
+                });
+
+                const checkboxes = volunteerChecklist.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', () => {
+                        const checkedCount = volunteerChecklist.querySelectorAll('input:checked').length;
+                        if (checkedCount >= maxVolunteers) {
+                            checkboxes.forEach(cb => {
+                                if (!cb.checked) cb.disabled = true;
+                            });
+                        } else {
+                            checkboxes.forEach(cb => {
+                                cb.disabled = false;
+                            });
+                        }
+                    });
+                });
+            }
+
+            // --- Handle Activity Selection Change ---
+            activitySelect.addEventListener('change', async function () {
+                const selectedActivityId = this.value;
+                if (!selectedActivityId) {
+                    populateCoordinatorDropdown(null);
+                    resetVolunteerChecklist();
+                    return;
+                }
+                const activities = await loadActivities();
+                const selectedActivity = activities.find(act => act.id === selectedActivityId);
+                if (selectedActivity) {
+                    await populateCoordinatorDropdown(selectedActivity.tanggal);
+                    await populateVolunteerChecklist(selectedActivity.tanggal, selectedActivity.kuota_relawan);
+                }
+            });
+
+            // --- [REVISED] Automatically update assignment statuses ---
+            async function updateAssignmentStatuses() {
+                let assignments = await loadAssignments();
+                let wasUpdated = false;
+                const now = new Date();
+                const thirtyMinutesInMs = 30 * 60 * 1000;
+                const oneHourInMs = 60 * 60 * 1000;
+
+                assignments.forEach(assignment => {
+                    if (assignment.status === 'terjadwal') {
+                        const timeParts = (assignment.time || '00:00').split(' - ');
+                        const startTimeString = timeParts[0].trim();
+                        const activityStartDateTime = new Date(`${assignment.date}T${startTimeString}`); // FIX: Include time
+                        if (activityStartDateTime.getTime() - now.getTime() <= thirtyMinutesInMs) {
+                            assignment.status = 'ongoing';
+                            wasUpdated = true;
+                        }
+                    } else if (assignment.status === 'ongoing') {
+                        const timeParts = (assignment.time || '00:00').split(' - ');
+                        if (timeParts.length > 1) {
+                            const endTimeString = timeParts[1].trim(); // FIX: Use endTimeString
+                            const activityEndDateTime = new Date(`${assignment.date}T${endTimeString}`); // FIX: Include time
+                            if (now.getTime() > (activityEndDateTime.getTime() + oneHourInMs)) {
+                                assignment.status = 'completed';
+                                wasUpdated = true;
+                            }
+                        }
+                    }
+                });
+
+                if (wasUpdated) {
+                    saveAssignments(assignments);
+                }
+                return wasUpdated;
+            }
+
+            // --- Render Table ---
+            async function renderAssignmentsTable() {
+                const assignments = await loadAssignments();
+                assignmentsTableBody.innerHTML = '';
+
+                if (assignments.length === 0) {
+                    assignmentsTableBody.innerHTML = `<tr><td colspan="7" class="empty-table-message">Belum ada penugasan yang dibuat.</td></tr>`;
+                    return;
+                }
+
+                assignments.forEach(assignment => {
+                    const row = document.createElement('tr');
+                    let statusBadgeHtml = '';
+                    let actionButtonsHtml = '';
+                    let rowClass = '';
+
+                    if (assignment.status === 'completed') {
+                        statusBadgeHtml = '<span class="status-badge status-completed">Selesai</span>';
+                        rowClass = 'assignment-completed';
+                        actionButtonsHtml = `<button class="action-button button-delete" data-id="${assignment.id}" data-action="delete">Hapus</button>`;
+                    } else if (assignment.status === 'ongoing') {
+                        statusBadgeHtml = '<span class="status-badge status-ongoing">Berlangsung</span>';
+                        actionButtonsHtml = `
+                            <button class="action-button button-complete" data-id="${assignment.id}" data-action="complete">Selesai</button>
+                            <button class="action-button button-delete" data-id="${assignment.id}" data-action="delete">Hapus</button>
+                        `;
+                    } else {
+                        statusBadgeHtml = `<span class="status-badge status-terjadwal">Terjadwal</span>`;
+                        actionButtonsHtml = `<button class="action-button button-delete" data-id="${assignment.id}" data-action="delete">Hapus</button>`;
+                    }
+
+                    row.className = rowClass;
+                    row.innerHTML = `
+                        <td>${assignment.activity_name}</td>
+                        <td>${new Date(assignment.date).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
+                        <td>${assignment.time || 'N/A'}</td>
+                        <td>${assignment.assigned_coordinator_name || 'N/A'}</td>
+                        <td>${assignment.assigned_volunteer_names.join(', ') || 'Tidak ada relawan'}</td>
+                        <td>${statusBadgeHtml}</td>
+                        <td class="action-buttons-cell">${actionButtonsHtml}</td>
+                    `;
+                    assignmentsTableBody.appendChild(row);
+                });
+
+                assignmentsTableBody.querySelectorAll('.action-button').forEach(button => {
+                    const action = button.dataset.action;
+                    if (action === 'delete') button.addEventListener('click', handleDeleteAssignment);
+                    else if (action === 'complete') button.addEventListener('click', handleCompleteAssignment);
+                });
+            }
+
+            // --- Form Submission Handler ---
+            assignmentForm.addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const selectedActivityId = activitySelect.value;
+                const selectedCoordinatorId = coordinatorSelect.value;
+                const selectedVolunteerCheckboxes = volunteerChecklist.querySelectorAll('input[name="volunteers"]:checked');
+
+                if (!selectedActivityId || !selectedCoordinatorId) {
+                    alert('Mohon lengkapi pilihan Kegiatan dan Koordinator.');
+                    return;
+                }
+
+                const activities = await loadActivities();
+                const selectedActivity = activities.find(act => act.id === selectedActivityId);
+                if (!selectedActivity) {
+                    alert('Kegiatan yang dipilih tidak valid.');
+                    return;
+                }
+
+                const maxVolunteers = selectedActivity.kuota_relawan - 1;
+                if (selectedVolunteerCheckboxes.length > maxVolunteers) {
+                    alert(`Jumlah relawan yang dipilih (${selectedVolunteerCheckboxes.length}) melebihi kuota yang tersedia (${maxVolunteers}).`);
+                    return;
+                }
+
+                const applicants = await loadApplicants();
+                const selectedCoordinator = applicants.find(app => app.id === selectedCoordinatorId);
+                const assignedVolunteerIds = Array.from(selectedVolunteerCheckboxes).map(cb => cb.value);
+                const assignedVolunteerNames = Array.from(selectedVolunteerCheckboxes).map(cb => cb.dataset.name);
+
+                const newAssignment = {
+                    id: 'assign-' + Date.now(),
+                    activity_id: selectedActivityId,
+                    activity_name: selectedActivity.nama_kegiatan,
+                    date: selectedActivity.tanggal,
+                    time: selectedActivity.waktu,
+                    location: selectedActivity.lokasi,
+                    description: selectedActivity.deskripsi,
+                    perlengkapan: selectedActivity.perlengkapan || '',
+                    catatan: selectedActivity.catatan || '',
+                    assigned_coordinator_id: selectedCoordinatorId,
+                    assigned_coordinator_name: selectedCoordinator ? selectedCoordinator.name : 'N/A',
+                    assigned_volunteer_ids: assignedVolunteerIds,
+                    assigned_volunteer_names: assignedVolunteerNames,
+                    status: 'terjadwal'
+                };
+
+                let assignments = await loadAssignments();
+                assignments.push(newAssignment);
+                saveAssignments(assignments);
+
+                const allUsers = JSON.parse(localStorage.getItem('usersData') || '[]');
+                const allApplicants = await loadApplicants();
+                const allAssignedIds = [newAssignment.assigned_coordinator_id, ...newAssignment.assigned_volunteer_ids];
+
+                allAssignedIds.forEach((volunteerId) => {
+                    const volunteerApplicant = allApplicants.find(app => app.id === volunteerId);
+                    if (volunteerApplicant) {
+                        const volunteerUser = allUsers.find(user => user.email === volunteerApplicant.email);
+                        if (volunteerUser) {
+                            const notificationKey = 'userNotifications_' + volunteerUser.username;
+                            let notifications = JSON.parse(localStorage.getItem(notificationKey) || '[]');
+                            notifications.push({
+                                type: 'new_assignment',
+                                title: 'Penugasan Baru Ditetapkan!',
+                                message: `Anda memiliki penugasan baru untuk kegiatan "${newAssignment.activity_name}" pada ${new Date(newAssignment.date).toLocaleDateString('id-ID')}.`,
+                                read: false
+                            });
+                            localStorage.setItem(notificationKey, JSON.stringify(notifications));
+                        }
+                    }
+                });
+
+                alert('Penugasan baru berhasil ditambahkan!');
+                await renderAssignmentsTable();
+                await populateActivityDropdown(); // Refresh dropdown to remove assigned activity
+                assignmentForm.reset();
+                resetVolunteerChecklist();
+            });
+
+            // --- Action Handlers ---
+            async function handleDeleteAssignment(event) {
+                const assignmentId = event.target.dataset.id;
+                if (confirm('Apakah Anda yakin ingin menghapus penugasan ini?')) {
+                    let assignments = await loadAssignments();
+                    assignments = assignments.filter(assign => assign.id !== assignmentId);
+                    saveAssignments(assignments);
+                    await renderAssignmentsTable();
+                    await populateActivityDropdown(); // Refresh dropdown in case the deleted one becomes available
+                    alert('Penugasan berhasil dihapus!');
+                }
+            }
+
+            async function handleCompleteAssignment(event) {
+                const assignmentId = event.target.dataset.id;
+                if (confirm('Apakah Anda yakin ingin menandai penugasan ini sebagai selesai?')) {
+                    let assignments = await loadAssignments();
+                    const assignmentIndex = assignments.findIndex(assign => assign.id === assignmentId);
+                    if (assignmentIndex > -1) {
+                        assignments[assignmentIndex].status = 'completed';
+                        saveAssignments(assignments);
+                        await renderAssignmentsTable();
+                        alert('Penugasan berhasil ditandai selesai!');
+                    }
+                }
+            }
+
+            // --- Logout & Notification Logic ---
+            const adminLogoutButton = document.getElementById('admin-logout-button');
+            if (adminLogoutButton) {
+                adminLogoutButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    localStorage.removeItem('loggedInUser');
+                    localStorage.removeItem('loggedInUserRole');
+                    window.location.href = 'login.html';
+                });
+            }
+
+            function checkAdminNotifications() {
+                const pengajuanNotifDot = document.getElementById('pengajuan-notif-dot');
+                const adminNotifications = JSON.parse(localStorage.getItem('adminNotificationsData') || '[]');
+                const hasUnreadNotifications = adminNotifications.some(
+                    notif => (notif.type === 'resignation' || notif.type === 'new_applicant') && !notif.read
+                );
+                if (hasUnreadNotifications && pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'block';
+                } else if (pengajuanNotifDot) {
+                    pengajuanNotifDot.style.display = 'none';
+                }
+            }
+
+            // --- Initial Load ---
+            checkAdminNotifications();
+            await updateAssignmentStatuses();
+            await populateActivityDropdown();
+            await populateCoordinatorDropdown(null);
+            resetVolunteerChecklist();
+            await renderAssignmentsTable();
+
+            setInterval(async () => {
+                const updated = await updateAssignmentStatuses();
+                if (updated) await renderAssignmentsTable();
+            }, 60000);
+        });
+    </script>
+
+</body>
+
+</html>

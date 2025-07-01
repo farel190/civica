@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - CivicaCare</title>
+
+    <!-- Google Fonts untuk Tipografi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Library Ikon untuk 'mata' pada password -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+
+    <style>
+        /* === Pengaturan Dasar === */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100%;
+            /* Menggunakan gambar latar yang sama dengan landing page */
+            background-image: url('bg.png');
+            /* PENTING: Pastikan file bg.png ada di folder yang sama */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* === Kontainer Login === */
+        .login-container {
+            width: 70%;
+            /* Lebar maksimal kartu login */
+            padding: 20px;
+        }
+
+        /* === Kartu Login === */
+        .login-card {
+            display: flex;
+            background-color: #fff;
+            border-radius: 20px;
+            /* Sudut yang lebih membulat */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            /* Memastikan gambar tidak keluar dari sudut membulat */
+            width: 100%;
+        }
+
+        /* === Bagian Gambar (Kiri) === */
+        .login-image-section {
+            flex-basis: 50%;
+            display: block;
+            /* Menghilangkan celah di bawah gambar */
+        }
+
+        .login-image-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Memastikan gambar memenuhi area tanpa distorsi */
+            display: block;
+        }
+
+        /* === Gaya untuk Kriteria Password === */
+        .password-criteria {
+            font-size: 0.85rem;
+            margin-top: 10px;
+            padding-left: 5px;
+            color: #666;
+            display: none;
+            /* Sembunyikan secara default */
+        }
+
+        .password-criteria ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .password-criteria li {
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-criteria li i {
+            margin-right: 8px;
+            width: 15px;
+            /* Lebar tetap untuk ikon */
+            text-align: center;
+        }
+
+        .password-criteria li.valid {
+            color: #28a745;
+            /* Hijau untuk valid */
+        }
+
+        .password-criteria li.valid .fa-times {
+            color: #28a745;
+        }
+
+        .password-criteria li:not(.valid) .fa-times {
+            color: #dc3545;
+            /* Merah untuk tidak valid */
+        }
+
+        .form-input.is-valid {
+            border-color: #28a745;
+            /* Hijau */
+        }
+
+        .form-input.is-invalid {
+            border-color: #dc3545;
+            /* Merah */
+        }
+
+        /* === Bagian Form (Kanan) === */
+        .login-form-section {
+            flex-basis: 50%;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            justify-content: center;
+            /* Memusatkan logo */
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+        }
+
+        .logo h1 {
+            font-family: 'Lora', serif;
+            font-size: 2.5rem;
+            margin: 0;
+            color: #1a1a1a;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px 12px 15px;
+            /* Memberi ruang untuk label */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        /* [DITAMBAHKAN] Wrapper untuk input dan ikon */
+        .input-with-icon {
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6A38C2;
+        }
+
+        .form-label {
+            position: absolute;
+            left: 15px;
+            top: -8px;
+            background-color: white;
+            padding: 0 5px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .password-toggle-icon {
+            position: absolute;
+            right: 0px;
+            left: 100%;
+            transform: translateY(-200%);
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        /* [PERUBAHAN] Wrapper untuk tombol agar bisa di tengah */
+        .login-button-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* [PERUBAHAN] Tombol login diperkecil */
+        .login-button {
+            /* width: 100%; -> Dihapus agar tidak full-width */
+            padding: 12px 45px;
+            /* Padding diubah untuk ukuran baru */
+            border: none;
+            background-color: #6A38C2;
+            color: white;
+            font-size: 1rem;
+            /* Ukuran font disesuaikan */
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+            /* Agar bisa diatur di tengah */
+        }
+
+        .login-button:hover {
+            background-color: #592EAB;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .register-link a {
+            color: #6A38C2;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .error-message {
+            color: #D83A56;
+            /* Warna merah untuk pesan error */
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        /* === Media Query untuk Responsif === */
+        @media (max-width: 768px) {
+            .login-image-section {
+                display: none;
+                /* Sembunyikan gambar di layar kecil */
+            }
+
+            .login-form-section {
+                flex-basis: 100%;
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Bagian Kiri: Gambar -->
+            <div class="login-image-section">
+                <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2070&auto=format&fit=crop"
+                    alt="Relawan bekerja sama">
+            </div>
+
+            <!-- Bagian Kanan: Form Daftar -->
+            <div class="login-form-section">
+                <div class="logo">
+                    <img src="logo.png" alt="Logo Icon CivicaCare" class="logo-icon">
+                    <h1>CivicaCare</h1>
+                </div>
+                <h2 class="form-title">Buat Akun Baru</h2>
+                <form>
+                    <div class="form-group">
+                        <input type="text" id="username" class="form-input" required autocomplete="off"
+                            placeholder="Username">
+                        <div id="username-error-message" class="error-message" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" id="email" class="form-input" required autocomplete="off"
+                            placeholder="Email">
+                        <div id="email-error-message" class="error-message" style="display: none;"></div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" class="form-input" required autocomplete="off"
+                            placeholder="Password">
+                        <div class="input-with-icon">
+                            <i id="togglePassword" class="fa-regular fa-eye password-toggle-icon"></i>
+                        </div>
+                        <div id="password-criteria" class="password-criteria">
+                            <ul>
+                                <li id="length-criteria"><i class="fas fa-times"></i> Minimal 8 karakter</li>
+                                <li id="lowercase-criteria"><i class="fas fa-times"></i> Setidaknya satu huruf kecil
+                                </li>
+                                <li id="uppercase-criteria"><i class="fas fa-times"></i> Setidaknya satu huruf besar
+                                </li>
+                                <li id="number-criteria"><i class="fas fa-times"></i> Setidaknya satu angka</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="confirm-password" class="form-input" required autocomplete="off"
+                            placeholder="Konfirmasi Password">
+                        <div class="input-with-icon">
+                            <i id="toggleConfirmPassword" class="fa-regular fa-eye password-toggle-icon"></i>
+                        </div>
+                    </div>
+                    <div class="login-button-wrapper">
+                        <button type="submit" class="login-button">Daftar Akun</button>
+                    </div>
+                </form>
+                <div class="register-link">
+                    Sudah punya akun? <a href="login.html">Masuk di sini</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script untuk toggle password visibility
+        function setupPasswordToggle(passwordInputId, toggleIconId) {
+            const passwordInput = document.getElementById(passwordInputId);
+            const toggleIcon = document.getElementById(toggleIconId);
+
+            if (toggleIcon && passwordInput) {
+                toggleIcon.addEventListener('click', function (e) {
+
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // [PERBAIKAN] Ganti ikon mata antara terbuka dan tertutup dengan menukar kelasnya
+                    this.classList.toggle('fa-eye');
+                    this.classList.toggle('fa-eye-slash');
+                });
+            }
+        }
+
+        setupPasswordToggle('password', 'togglePassword');
+        setupPasswordToggle('confirm-password', 'toggleConfirmPassword');
+
+        // --- Logika Validasi Real-time ---
+        const usernameInput = document.getElementById('username');
+        const usernameErrorMessage = document.getElementById('username-error-message');
+        const emailInput = document.getElementById('email');
+        const emailErrorMessage = document.getElementById('email-error-message');
+        let isUsernameTaken = false;
+        let isEmailTaken = false;
+        let debounceTimeout;
+
+        // Fungsi untuk memeriksa ketersediaan (username atau email)
+        function checkAvailability(inputElement, errorMessageElement, checkType) {
+            clearTimeout(debounceTimeout);
+            const value = inputElement.value.trim().toLowerCase();
+
+            // Reset status
+            errorMessageElement.textContent = '';
+            errorMessageElement.style.display = 'none';
+            inputElement.classList.remove('is-valid', 'is-invalid');
+            if (checkType === 'username') isUsernameTaken = false;
+            if (checkType === 'email') isEmailTaken = false;
+
+            if (value === '') return;
+
+            // Validasi format email terlebih dahulu
+            if (checkType === 'email' && !value.endsWith('@gmail.com')) {
+                errorMessageElement.textContent = 'Email harus berformat @gmail.com.';
+                errorMessageElement.style.display = 'block';
+                inputElement.classList.add('is-invalid');
+                isEmailTaken = true;
+                return;
+            }
+
+            debounceTimeout = setTimeout(async () => {
+                try {
+                    const users = JSON.parse(localStorage.getItem('usersData') || '[]');
+                    // [FIX] Add check to ensure user[checkType] exists before calling toLowerCase()
+                    const exists = users.some(user => user[checkType] && user[checkType].toLowerCase() === value);
+
+                    if (exists) {
+                        errorMessageElement.textContent = `${checkType.charAt(0).toUpperCase() + checkType.slice(1)} ini sudah digunakan.`;
+                        errorMessageElement.style.display = 'block';
+                        inputElement.classList.add('is-invalid');
+                        if (checkType === 'username') isUsernameTaken = true;
+                        if (checkType === 'email') isEmailTaken = true;
+                    } else {
+                        // [NEW] Add valid class if not taken
+                        inputElement.classList.add('is-valid');
+                    }
+                } catch (error) {
+                    console.error(`Error checking ${checkType}:`, error);
+                    errorMessageElement.textContent = `Terjadi kesalahan saat memeriksa ${checkType}.`;
+                    errorMessageElement.style.display = 'block';
+                    if (checkType === 'username') isUsernameTaken = true;
+                    if (checkType === 'email') isEmailTaken = true;
+                }
+            }, 500);
+        }
+
+        usernameInput.addEventListener('input', () => checkAvailability(usernameInput, usernameErrorMessage, 'username'));
+        emailInput.addEventListener('input', () => checkAvailability(emailInput, emailErrorMessage, 'email'));
+
+        // --- Logika Validasi Password Kuat ---
+        const passwordInput = document.getElementById('password');
+        const passwordCriteria = document.getElementById('password-criteria');
+        const lengthCriteria = document.getElementById('length-criteria');
+        const lowercaseCriteria = document.getElementById('lowercase-criteria');
+        const uppercaseCriteria = document.getElementById('uppercase-criteria');
+        const numberCriteria = document.getElementById('number-criteria');
+
+        // Tampilkan kriteria saat input password mendapat fokus
+        passwordInput.addEventListener('focus', function () {
+            passwordCriteria.style.display = 'block';
+        });
+
+        // Sembunyikan kriteria jika input kosong dan kehilangan fokus
+        passwordInput.addEventListener('blur', function () {
+            if (this.value === '') {
+                passwordCriteria.style.display = 'none';
+            }
+        });
+
+        // Validasi real-time saat mengetik
+        passwordInput.addEventListener('input', function () {
+            const password = this.value;
+
+            // Cek Panjang (Minimal 8 karakter)
+            if (password.length >= 8) {
+                lengthCriteria.classList.add('valid');
+            } else {
+                lengthCriteria.classList.remove('valid');
+            }
+
+            // Cek Huruf Kecil (Setidaknya satu huruf kecil)
+            if (/[a-z]/.test(password)) {
+                lowercaseCriteria.classList.add('valid');
+            } else {
+                lowercaseCriteria.classList.remove('valid');
+            }
+
+            // Cek Huruf Besar (Setidaknya satu huruf besar)
+            if (/[A-Z]/.test(password)) {
+                uppercaseCriteria.classList.add('valid');
+            } else {
+                uppercaseCriteria.classList.remove('valid');
+            }
+
+            // Cek Angka (Setidaknya satu angka)
+            if (/[0-9]/.test(password)) {
+                numberCriteria.classList.add('valid');
+            } else {
+                numberCriteria.classList.remove('valid');
+            }
+
+            // [NEW] Add valid/invalid class to the password input itself
+            if (arePasswordCriteriaMet()) {
+                passwordInput.classList.remove('is-invalid');
+                passwordInput.classList.add('is-valid');
+            } else {
+                passwordInput.classList.remove('is-valid');
+                passwordInput.classList.add('is-invalid');
+            }
+            validateConfirmPassword(); // Panggil validasi konfirmasi password juga
+        });
+
+        // Fungsi untuk memeriksa apakah semua kriteria password terpenuhi
+        function arePasswordCriteriaMet() {
+            const password = passwordInput.value;
+            return (
+                password.length >= 8 &&
+                /[a-z]/.test(password) &&
+                /[A-Z]/.test(password) &&
+                /[0-9]/.test(password)
+            );
+        }
+
+        // --- Logika Validasi Konfirmasi Password ---
+        const confirmPasswordInput = document.getElementById('confirm-password');
+        const registerForm = document.querySelector('form');
+
+        // Tambahkan elemen untuk pesan error konfirmasi password
+        let confirmPasswordError = document.createElement('div');
+        confirmPasswordError.style.color = '#D83A56';
+        confirmPasswordError.style.fontSize = '0.85rem';
+        confirmPasswordError.style.marginTop = '5px';
+        confirmPasswordError.style.display = 'none'; // Sembunyikan default
+        confirmPasswordInput.parentNode.appendChild(confirmPasswordError); // Tambahkan ke parent dari input konfirmasi password
+
+        // [REFACTORED] Function to validate confirm password
+        function validateConfirmPassword() {
+            // Clear previous state if confirm password field is empty
+            if (confirmPasswordInput.value === '') {
+                confirmPasswordInput.classList.remove('is-valid', 'is-invalid');
+                confirmPasswordError.style.display = 'none';
+                return true; // Return true as it's not an error state
+            }
+
+            if (passwordInput.value === confirmPasswordInput.value) {
+                confirmPasswordInput.classList.remove('is-invalid');
+                confirmPasswordInput.classList.add('is-valid');
+                confirmPasswordError.style.display = 'none';
+                return true;
+            } else {
+                confirmPasswordInput.classList.remove('is-valid');
+                confirmPasswordInput.classList.add('is-invalid');
+                confirmPasswordError.textContent = 'Password tidak cocok.';
+                confirmPasswordError.style.display = 'block';
+                return false;
+            }
+        }
+
+        // Panggil validasi konfirmasi password saat salah satu input berubah
+        passwordInput.addEventListener('input', validateConfirmPassword);
+        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+
+        // --- Logika Submit Formulir ---
+        registerForm.addEventListener('submit', async function (event) {
+            event.preventDefault(); // Selalu cegah submit default untuk validasi manual
+
+            // Validasi password kuat
+            if (!arePasswordCriteriaMet()) {
+                alert('Password tidak memenuhi kriteria keamanan (minimal 8 karakter, mengandung huruf besar, kecil, dan angka).');
+                return;
+            }
+            // Validasi username (cek flag isUsernameTaken)
+            if (isUsernameTaken) {
+                alert('Username sudah digunakan. Mohon pilih username lain.');
+                return;
+            }
+            // Validasi email
+            if (isEmailTaken) {
+                alert('Email sudah terdaftar atau formatnya salah. Mohon perbaiki.');
+                return;
+            }
+            // Validasi konfirmasi password
+            if (!validateConfirmPassword()) {
+                alert('Konfirmasi password tidak cocok.');
+                return;
+            }
+
+            // Jika semua validasi lolos, simpan data pengguna baru ke localStorage (usersData)
+            const newUsername = usernameInput.value.trim();
+            const newEmail = emailInput.value.trim();
+            const newPassword = passwordInput.value;
+
+            // Load existing users from localStorage or users.json
+            let users = JSON.parse(localStorage.getItem('usersData') || '[]');
+
+            // Add new user
+            users.push({
+                username: newUsername,
+                email: newEmail,
+                password: newPassword,
+                role: 'relawan'
+            });
+            localStorage.setItem('usersData', JSON.stringify(users));
+
+            alert('Pendaftaran berhasil!');
+            window.location.href = 'login.html';
+        });
+    </script>
+
+</body>
+
+</html>

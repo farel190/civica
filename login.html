@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CivicaCare</title>
+
+    <!-- Google Fonts untuk Tipografi -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@700&family=Poppins:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Library Ikon untuk 'mata' pada password -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+
+    <style>
+        /* === Pengaturan Dasar === */
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            height: 100%;
+            /* Menggunakan gambar latar yang sama dengan landing page */
+            background-image: url('bg.png');
+            /* PENTING: Pastikan file bg.png ada di folder yang sama */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* === Kontainer Login === */
+        .login-container {
+            width: 70%;
+            /* Lebar maksimal kartu login */
+            padding: 20px;
+        }
+
+        /* === Kartu Login === */
+        .login-card {
+            display: flex;
+            background-color: #fff;
+            border-radius: 20px;
+            /* Sudut yang lebih membulat */
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            /* Memastikan gambar tidak keluar dari sudut membulat */
+            width: 100%;
+        }
+
+        /* === Bagian Gambar (Kiri) === */
+        .login-image-section {
+            flex-basis: 50%;
+            display: block;
+            /* Menghilangkan celah di bawah gambar */
+        }
+
+        .login-image-section img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Memastikan gambar memenuhi area tanpa distorsi */
+            display: block;
+        }
+
+        /* === Bagian Form (Kanan) === */
+        .login-form-section {
+            flex-basis: 50%;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            justify-content: center;
+            /* Memusatkan logo */
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+        }
+
+        .logo h1 {
+            font-family: 'Lora', serif;
+            font-size: 2.5rem;
+            margin: 0;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            /* Memberi ruang untuk ikon di kanan */
+            /* Memberi ruang untuk label */
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+
+        }
+
+        /* [DITAMBAHKAN] Wrapper untuk input dan ikon */
+        .input-with-icon {
+            position: relative;
+            display: block;
+        }
+
+        .form-input.is-valid {
+            border-color: #28a745;
+            /* Hijau */
+        }
+
+        .form-input.is-invalid {
+            border-color: #dc3545;
+            /* Merah */
+        }
+
+        .feedback-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            /* Sembunyikan secara default */
+        }
+
+        .is-valid~.feedback-icon.fa-check-circle {
+            display: block;
+            color: #28a745;
+            /* Hijau */
+        }
+
+        .is-invalid~.feedback-icon.fa-times-circle {
+            display: block;
+            color: #dc3545;
+            /* Merah */
+        }
+
+        .validation-message {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            color: #dc3545;
+            /* Merah */
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #6A38C2;
+        }
+
+        .form-label {
+            position: absolute;
+            left: 15px;
+            top: -8px;
+            background-color: white;
+            padding: 0 5px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .form-title {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 500;
+            color: #333;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .password-toggle-icon {
+            position: absolute;
+            right: 15px;
+            left: 85%;
+            transform: translateY(-200%);
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        /* [PERUBAHAN] Wrapper untuk tombol agar bisa di tengah */
+        .login-button-wrapper {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        /* [PERUBAHAN] Tombol login diperkecil */
+        .login-button {
+            /* width: 100%; -> Dihapus agar tidak full-width */
+            padding: 12px 45px;
+            /* Padding diubah untuk ukuran baru */
+            border: none;
+            background-color: #6A38C2;
+            color: white;
+            font-size: 1rem;
+            /* Ukuran font disesuaikan */
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+            /* Agar bisa diatur di tengah */
+        }
+
+        .login-button:hover {
+            background-color: #592EAB;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .register-link a {
+            color: #6A38C2;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* === Media Query untuk Responsif === */
+        @media (max-width: 768px) {
+            .login-image-section {
+                display: none;
+                /* Sembunyikan gambar di layar kecil */
+            }
+
+            .login-form-section {
+                flex-basis: 100%;
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Bagian Kiri: Gambar -->
+            <div class="login-image-section">
+                <!-- Ganti 'volunteers.jpg' dengan nama file gambar Anda -->
+                <img src="https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=2070&auto=format&fit=crop"
+                    alt="Relawan bekerja sama">
+            </div>
+
+            <!-- Bagian Kanan: Form Login -->
+            <div class="login-form-section">
+                <div class="logo">
+                    <img src="logo.png" alt="Logo Icon CivicaCare" class="logo-icon">
+                    <h1>CivicaCare</h1>
+                </div>
+                <h2 class="form-title">Silahkan Masuk</h2>
+                <form id="login-form">
+                    <div class="form-group">
+                        <div class="input-with-icon">
+                            <input type="text" id="username" class="form-input" required autocomplete="off"
+                                placeholder="Username">
+                            <!-- Ikon Validasi -->
+                            <i class="fas fa-check-circle feedback-icon"></i>
+                            <i class="fas fa-times-circle feedback-icon"></i>
+                        </div>
+                        <div id="username-validation-message" class="validation-message" style="display: none;">Username
+                            tidak ditemukan.</div>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="password" class="form-input" required autocomplete="off"
+                            placeholder="Password">
+                        <div class="input-with-icon">
+                            <i id="togglePassword" class="fa-regular fa-eye password-toggle-icon"></i>
+                        </div>
+                    </div>
+                    <div class="login-button-wrapper">
+                        <button type="submit" class="login-button">Masuk</button>
+                    </div>
+                </form>
+                <div id="error-message" style="color: #D83A56; text-align: center; margin-top: 15px; font-weight: 500;">
+                </div>
+                <div class="register-link">
+                    Belum punya akun? <a href="register.html">Daftar Akun</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script untuk toggle password visibility
+        const togglePasswordIcon = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+
+        togglePasswordIcon.addEventListener('click', function (e) {
+            // ganti tipe atribut
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // [PERBAIKAN] Ganti ikon mata antara terbuka dan tertutup dengan menukar kelasnya
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+        // --- Validasi Username Real-time ---
+        const usernameInput = document.getElementById('username');
+        const usernameValidationMessage = document.getElementById('username-validation-message');
+        let usernameDebounceTimeout;
+
+        usernameInput.addEventListener('input', function () {
+            clearTimeout(usernameDebounceTimeout);
+            const username = this.value.trim();
+
+            // Reset status validasi
+            usernameInput.classList.remove('is-valid', 'is-invalid');
+            usernameValidationMessage.style.display = 'none';
+
+            if (username === '') {
+                return; // Jangan lakukan apa-apa jika input kosong
+            }
+
+            usernameDebounceTimeout = setTimeout(async () => {
+                try {
+                    // Centralized function to load users data
+                    async function loadUsersData() {
+                        let users = JSON.parse(localStorage.getItem('usersData'));
+                        if (!users) {
+                            try {
+                                const response = await fetch('users.json');
+                                if (!response.ok) throw new Error('Gagal memuat data pengguna.');
+                                users = await response.json();
+                                localStorage.setItem('usersData', JSON.stringify(users));
+                            } catch (error) {
+                                console.error('Error loading initial users data:', error);
+                                return []; // Return empty array on error
+                            }
+                        }
+                        return users;
+                    }
+
+                    const users = await loadUsersData(); // Use the centralized function
+
+                    const userExists = users.some(u => u.username === username); // Check against loaded users
+
+                    if (userExists) {
+                        usernameInput.classList.add('is-valid');
+                    } else {
+                        usernameInput.classList.add('is-invalid');
+                        usernameValidationMessage.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error saat validasi username:', error);
+                }
+            }, 500); // Jeda 500ms setelah pengguna berhenti mengetik
+        });
+
+        // Script untuk handle login
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', async function (event) {
+            event.preventDefault(); // Mencegah form submit secara default
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            errorMessage.textContent = ''; // Bersihkan pesan error sebelumnya
+
+            try {
+                // Centralized function to load users data
+                async function loadUsersData() {
+                    let users = JSON.parse(localStorage.getItem('usersData'));
+                    if (!users) {
+                        try {
+                            const response = await fetch('users.json');
+                            if (!response.ok) throw new Error('Gagal memuat data pengguna.');
+                            users = await response.json();
+                            localStorage.setItem('usersData', JSON.stringify(users));
+                        } catch (error) {
+                            console.error('Error loading initial users data:', error);
+                            return []; // Return empty array on error
+                        }
+                    }
+                    return users;
+                }
+
+                const users = await loadUsersData(); // Use the centralized function
+
+                const user = users.find(u => u.username === username && u.password === password);
+
+                if (user) {
+                    if (user.role === 'relawan') {
+                        localStorage.setItem('loggedInUser', username); // Simpan username relawan SEBELUM pengalihan
+                        // console.log("Login Relawan: user object found:", user); // Debugging
+                        // console.log("Login Relawan: Setting loggedInUserEmail to:", user.email); // Debugging
+                        localStorage.setItem('loggedInUserEmail', user.email); // Simpan email relawan
+                        localStorage.setItem('loggedInUserRole', user.role); // Simpan role pengguna
+                        // Load applicants data to find the volunteer's ID (if not already set)
+                        let loggedInVolunteerId = localStorage.getItem('loggedInVolunteerId');
+                        if (!loggedInVolunteerId) { // Only try to find if not already set
+                            // Function to load applicants data (prioritize localStorage)
+                            async function loadApplicantsData() {
+                                let applicants = JSON.parse(localStorage.getItem('applicantsData'));
+                                if (!applicants) {
+                                    try {
+                                        const response = await fetch('applicants.json');
+                                        if (!response.ok) throw new Error('Gagal memuat data pendaftar.');
+                                        applicants = await response.json();
+                                        localStorage.setItem('applicantsData', JSON.stringify(applicants));
+                                    } catch (error) {
+                                        console.error('Error loading initial applicants data:', error);
+                                        return [];
+                                    }
+                                }
+                                return applicants;
+                            }
+                            const applicants = await loadApplicantsData();
+                            // Find the applicant ID based on email (more reliable than username for matching)
+                            const loggedInApplicant = applicants.find(app => app.email === user.email);
+                            if (loggedInApplicant) {
+                                localStorage.setItem('loggedInVolunteerId', loggedInApplicant.id);
+                            } else {
+                                console.warn('Applicant data not found for logged-in volunteer username:', username);
+                            }
+                        }
+                        window.location.href = 'dashboard-relawan.html';
+                        return; // Hentikan eksekusi lebih lanjut
+                    } else if (user.role === 'admin') {
+                        localStorage.setItem('loggedInUser', username); // *** FIX: Set loggedInUser for admin ***
+                        localStorage.setItem('loggedInUserRole', user.role); // Simpan role pengguna
+                        window.location.href = 'dashboard-admin.html';
+                        return; // Hentikan eksekusi lebih lanjut
+                    }
+                } else {
+                    // Jika data salah atau bukan relawan
+                    errorMessage.textContent = 'Username atau password salah.';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.textContent = 'Terjadi kesalahan. Silakan coba lagi.';
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>
