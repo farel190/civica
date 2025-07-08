@@ -1,0 +1,8 @@
+note : 
+
+- database sudah ada id folder dengan nama "civicacare.sql"
+
+- link hosting :
+https://seagull-flowing-virtually.ngrok-free.app/
+
+- folder projek "CivicaCare" diletakkan di dalam folder xampp/htdocs/
